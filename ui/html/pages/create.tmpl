@@ -1,0 +1,35 @@
+{{define "title"}}Create a New Post{{end}}
+
+{{define "main"}}
+<form action='/post/create' method='POST'>
+    <div>
+        <label>Title:</label>
+        <!-- Use the `with` action to render the value of .Form.FieldErrors.title
+        if it is not empty. -->
+        {{with .Form.FieldErrors.title}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <!-- Re-populate the title data by setting the `value` attribute. -->
+        <input type='text' name='title' value='{{.Form.Title}}'>
+    </div>
+    <div>
+        <label>Content:</label>
+        <!-- Likewise render the value of .Form.FieldErrors.content if it is not
+        empty. -->
+        {{with .Form.FieldErrors.content}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <!-- Re-populate the content data as the inner HTML of the textarea. -->
+        <textarea name='content'>{{.Form.Content}}</textarea>
+    </div>
+    <div>
+        <label>Select Categories:</label><br>
+        {{range .Categories}}
+            <input type="checkbox" name="categoryIds[]" value="{{.Id}}"> {{.Name}}<br>
+        {{end}}
+    </div>
+    <div>
+        <input type='submit' value='Publish post'>
+    </div>
+</form>
+{{end}}

@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  forum:
+    build: .
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./data:/data
+    environment:
+      - DB_PATH=/data/forum.db

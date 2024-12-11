@@ -1,0 +1,70 @@
+{{define "title"}}Post #{{.Post.Id}}{{end}}
+
+{{define "main"}}
+    {{with .Post}}
+    <div class='post'>
+        <div class='metadata'>
+            <strong>{{.Title}}</strong>
+        </div>
+        <pre><code>{{.Content}}</code></pre>
+        <div class='metadata'>
+            <strong>By {{.Username}}</strong>
+            <!-- Use the new template function here -->
+            <time>Created: {{humanDate .Created}}</time>
+        </div>
+        <div class="post-actions">
+        <form action="/post/like" method="POST">
+            <input type="hidden" name="PostId" value="{{.Id}}">
+            <button type='submit' class="like-button">👍 Like ({{.Likes}})</button>
+        </form>
+        <form action="/post/dislike" method="POST">
+            <input type="hidden" name="PostId" value="{{.Id}}">
+            <button type='submit' class="dislike-button">👎 Dislike ({{.Dislikes}})</button>
+        </form>
+        </div>
+    </div>
+    <div class="comments">
+        <strong>Comments</strong>
+        {{if .Comments}}
+            <div class="comment-list">
+                {{range .Comments}}
+                 <div class="comment">
+                    <div class="comment-header">
+                        <strong>{{.Username}}</strong> <span class="comment-date">{{humanDate .Created}}</span>
+                    </div>
+                    <div class="comment-body">
+                        <p class="comment-text">{{.Content}}</p>
+                    </div>
+                    <div class="comment-actions">
+                        <form action="/comment/like" method="POST">
+                            <input type="hidden" name="CommentId" value="{{.Id}}">
+                            <button type='submit' class="like-button">👍 ({{.Likes}})</button>
+                        </form>
+                        <form action="/comment/dislike" method="POST">
+                            <input type="hidden" name="CommentId" value="{{.Id}}">
+                            <button type='submit' class="dislike-button">👎 ({{.Dislikes}})</button>
+                        </form>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        {{else}}
+            <p>There's nothing to see here... yet!</p><br><br>
+        {{end}}
+    </div>
+    {{end}}
+    {{if .IsAuthenticated}}
+        <div class="post-comment">
+            <h3>Post a Comment</h3>
+            <form action="/post/comment" method="POST">
+                <input type="hidden" name="PostId" value="{{.Post.Id}}">
+                <textarea name="content" rows="4" cols="50" placeholder="Your comment..." required></textarea><br>
+                <div>
+                    <input type='submit' value='Post Comment'>
+                </div>
+            </form>
+        </div>
+    {{else}}
+        <p>You must be logged in to post a comment.</p>
+    {{end}}
+{{end}}

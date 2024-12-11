@@ -1,0 +1,36 @@
+{{define "title"}}Liked Posts{{end}}
+
+{{define "main"}}
+<div class="container">
+    <div class="categories-container">
+    <h2>Filters</h2>
+    <form method="GET" action="/liked">
+        <button type="submit">Liked Posts</button>
+    </form>
+    <form method="GET" action="/liked">
+        <button type="submit" name="createdPosts" value="true">Created Posts</button>
+    </form>
+    <br><br><a href='/'>Clear</a>
+    </div>
+    
+    {{if .Posts}}
+    <div class="post-list-container">
+    <h2>Posts</h2>
+     <table>
+        <tr>
+            <th>Title</th>
+            <th>Created</th>
+        </tr>
+        {{range .Posts}}
+        <tr>
+            <td><a href='/post/view?id={{.Id}}'>{{.Title}}</a></td>
+            <!-- Use the new template function here -->
+            <td>{{humanDate .Created}}</td>
+        </tr>
+        {{end}}
+    </table>
+    {{else}}
+        <p>There's nothing to see here... yet!</p>
+    {{end}}
+</div>
+{{end}}
