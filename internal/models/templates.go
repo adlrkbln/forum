@@ -7,6 +7,8 @@ type TemplateData struct {
 	Category        *Category
 	Categories      []*Category
 	User            *User
+	Report          *Report
+	Reports         []*Report
 	Form            any
 	IsAuthenticated bool
 	IsModerator     bool

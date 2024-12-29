@@ -25,6 +25,8 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("/user/profile", h.RequireAuthentication(h.accountPageGet))
 
 	mux.HandleFunc("/moderator/report", h.RequireModerator(h.reportPost))
+	mux.HandleFunc("/admin/delete-post", h.RequireAdmin(h.deletePost))
+	mux.HandleFunc("/admin/ignore-report", h.RequireAdmin(h.ignoreReport))
 
 	return h.RecoverPanic(h.LogRequest(SecureHeaders(mux)))
 }

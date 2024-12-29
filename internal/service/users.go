@@ -76,3 +76,11 @@ func (s *service) ReportPost(moderator_id int, post_id int, reason string) error
 
 	return err
 }
+
+func (s *service) GetAllReports() ([]*models.Report, error) {
+	reports, err := s.repo.GetAllReports()
+	if err != nil {
+		return nil, err
+	}
+	return reports, nil
+}

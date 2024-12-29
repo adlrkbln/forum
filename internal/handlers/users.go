@@ -150,7 +150,7 @@ func (h *Handler) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) accountPageGet(w http.ResponseWriter, r *http.Request) {
-	user, err := h.service.GetUser(r) // Retrieve user info from session
+	user, err := h.service.GetUser(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
@@ -162,6 +162,15 @@ func (h *Handler) accountPageGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data.User = user
+
+	if user.Role == "Admin" {
+		reports, err := h.service.GetAllReports()
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		data.Reports = reports
+	}
 
 	h.Render(w, http.StatusOK, "account.tmpl", data)
 }

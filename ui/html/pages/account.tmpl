@@ -1,16 +1,14 @@
 {{define "title"}}Profile{{end}}
 
 {{define "main"}}
-<div class="container">
-    {{with .User}}
-    <h2>Profile Details</h2>
+    <h2>Profile Details</h2><br>
     <div class="profile-info">
-        <p><strong>Username:</strong> {{.Name}}</p>
-        <p><strong>Email:</strong> {{.Email}}</p>
-        <p><strong>Role:</strong> {{.Role}}</p>
-    </div>
+        <p><strong>Username:</strong> {{.User.Name}}</p>
+        <p><strong>Email:</strong> {{.User.Email}}</p>
+        <p><strong>Role:</strong> {{.User.Role}}</p>
+    </div><br><br>
 
-    {{if eq .Role "User"}}
+    {{if eq .User.Role "User"}}
     <div class="user-actions">
         <h3>Actions</h3>
         <form action="/moderator/request" method="POST">
@@ -19,23 +17,51 @@
     </div>
     {{end}}
 
-    {{if eq .Role "Moderator"}}
+    {{if eq .User.Role "Moderator"}}
     <div class="moderator-actions">
         <h3>Moderator Actions</h3>
         <a href="/moderator/reports">View Reports</a>
     </div>
     {{end}}
-
-    {{if eq .Role "Admin"}}
-    <div class="admin-actions">
-        <h3>Admin Actions</h3>
-        <ul>
-            <li><a href="/admin/reports">View and Respond to Reports</a></li>
-            <li><a href="/admin/manage-users">Manage Users</a></li>
-            <li><a href="/admin/categories">Manage Categories</a></li>
-        </ul>
+    {{if eq .User.Role "Admin"}}
+    <div class="admin-reports">
+        <h3>Reports</h3>
+        {{if .Reports}}
+        <table>
+            <tr>
+                <th>Post ID</th>
+                <th>Reported By</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            {{range .Reports}}
+            <tr>
+                <td><a href='/post/view?id={{.PostId}}'>{{.PostId}}</td>
+                <td>{{.ModeratorName}}</td>
+                <td>{{.Reason}}</td>
+                <td>{{.Status}}</td>
+                {{if eq .Status "Pending"}}
+                <td>
+                    <form action="/admin/delete-post" method="POST" style="display:inline;">
+                        <input type="hidden" name="post_id" value="{{.PostId}}">
+                        <button type="submit">Delete Post</button>
+                    </form>
+                    <form action="/admin/ignore-report" method="POST" style="display:inline;">
+                        <input type="hidden" name="report_id" value="{{.Id}}">
+                        <button type="submit">Ignore</button>
+                    </form>
+                </td>
+                {{else}}
+                <td>None</td>
+                {{end}}
+            </tr>
+            {{end}}
+        </table>
+        {{else}}
+        <p>No reports to display.</p>
+        {{end}}
     </div>
-    {{end}}
     {{end}}
 </div>
 {{end}}

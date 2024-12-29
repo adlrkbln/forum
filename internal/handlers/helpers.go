@@ -49,6 +49,7 @@ func (h *Handler) NewTemplateData(w http.ResponseWriter, r *http.Request) (*mode
 
 	TemplateData.IsAuthenticated = h.IsAuthenticated(r)
 	TemplateData.IsModerator = h.IsModerator(r)
+	
 	if TemplateData.IsAuthenticated {
 		user, err := h.service.GetUser(r)
 		if err != nil {

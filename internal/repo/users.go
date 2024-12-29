@@ -84,3 +84,33 @@ func (sq *Sqlite) InsertReportPost(moderator_id int, post_id int, reason string)
 	_, err := sq.DB.Exec("INSERT INTO reports (post_id, moderator_id, reason) VALUES (?, ?, ?)", post_id, moderator_id, reason)
 	return err
 }
+
+func (sq *Sqlite) GetAllReports() ([]*models.Report, error) {
+	stmt := `SELECT r.id, r.post_id, r.moderator_id, u.name, r.reason, r.status, r.created_at FROM reports r
+	JOIN users u ON u.id = r.moderator_id
+    ORDER BY r.id DESC`
+
+	rows, err := sq.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	reports := []*models.Report{}
+
+	for rows.Next() {
+		s := &models.Report{}
+		err = rows.Scan(&s.Id, &s.PostId, &s.ModeratorId, &s.ModeratorName, &s.Reason, &s.Status, &s.Created)
+		if err != nil {
+			return nil, err
+		}
+		reports = append(reports, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return reports, nil
+}

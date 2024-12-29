@@ -28,10 +28,11 @@ type UserLoginForm struct {
 }
 
 type Report struct {
-	Id          int
-	PostId      int
-	ModeratorId int
-	Reason      string
-	Status      string // "Pending", "Resolved"
-	CreatedAt   time.Time
+	Id            int
+	PostId        int
+	ModeratorId   int
+	ModeratorName string
+	Reason        string
+	Status        string // "Pending", "Resolved"
+	Created       time.Time
 }

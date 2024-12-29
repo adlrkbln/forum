@@ -20,7 +20,9 @@ type PostModel interface {
 	InsertComment(post_id int, user_id int, content string) error
 	GetCreatedPosts(user_id int) ([]*models.Post, error)
 	GetLikedPosts(user_id int) ([]*models.Post, error)
-	InsertReportPost(moderator_id int, post_id int, reason string) error
+	DeletePost(post_id int) error
+	FindReportsForPost(post_id int) ([]*models.Report, error)
+	ChangeReportStatus(report_id int) error 
 }
 
 type UserModel interface {
@@ -28,6 +30,8 @@ type UserModel interface {
 	InsertUser(name, email, password string) error
 	Exists(id int) (bool, error)
 	GetUserByID(id int) (*models.User, error)
+	InsertReportPost(moderator_id int, post_id int, reason string) error
+	GetAllReports() ([]*models.Report, error)
 }
 
 type Session interface {

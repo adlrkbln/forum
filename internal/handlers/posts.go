@@ -247,3 +247,63 @@ func (h *Handler) reportPost(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	post_idStr := r.FormValue("post_id")
+	post_id, err := strconv.Atoi(post_idStr)
+	if err != nil || post_id < 1 {
+		h.NotFound(w)
+		return
+	}
+	user, err := h.service.GetUser(r)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	if user.Role != "Admin" {
+		http.Error(w, "Forbidden: Admin access required", http.StatusForbidden)
+		return
+	}
+	err = h.service.DeletePost(post_id)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
+}
+
+func (h *Handler) ignoreReport(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	report_idStr := r.FormValue("report_id")
+	report_id, err := strconv.Atoi(report_idStr)
+	if err != nil || report_id < 1 {
+		h.NotFound(w)
+		return
+	}
+	user, err := h.service.GetUser(r)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	if user.Role != "Admin" {
+		http.Error(w, "Forbidden: Admin access required", http.StatusForbidden)
+		return
+	}
+	err = h.service.IgnoreReport(report_id)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
+}

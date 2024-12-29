@@ -34,6 +34,8 @@ type Post interface {
 	AddLikePost(post_id int, user_id int) error
 	AddLikeComment(comment_id, user_id int) error
 	AddDislikeComment(comment_id, user_id int) error
+	DeletePost(post_id int) error
+	IgnoreReport(report_id int) error
 }
 
 type User interface {
@@ -43,4 +45,5 @@ type User interface {
 	DeleteSession(token string) error
 	IsSessionValid(token string) bool
 	ReportPost(moderatorId int, postId int, reason string) error
+	GetAllReports() ([]*models.Report, error)
 }

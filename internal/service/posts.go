@@ -98,3 +98,27 @@ func (s *service) GetLikedPosts(user_id int) ([]*models.Post, error) {
 	return posts, nil
 }
 
+func (s *service) DeletePost(post_id int) error {
+	err := s.repo.DeletePost(post_id)
+	if err != nil {
+		return err
+	}
+
+	reports, err := s.repo.FindReportsForPost(post_id)
+	for _, report := range reports {
+		err = s.repo.ChangeReportStatus(report.Id) 
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *service) IgnoreReport(report_id int) error {
+	err := s.repo.ChangeReportStatus(report_id) 
+	if err != nil {
+		return err
+	}
+	return nil
+}

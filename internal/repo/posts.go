@@ -203,3 +203,51 @@ func (sq *Sqlite) GetLikedPosts(user_id int) ([]*models.Post, error) {
 
 	return posts, nil
 }
+
+func (sq *Sqlite) DeletePost(post_id int) error {
+	stmt := `DELETE FROM posts WHERE id = ?`
+
+	_, err := sq.DB.Exec(stmt, post_id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (sq *Sqlite) FindReportsForPost(post_id int) ([]*models.Report, error) {
+	stmt := `SELECT id, post_id, moderator_id, reason, status, created_at FROM reports WHERE post_id = ? AND status = 'Pending';`
+
+	rows, err := sq.DB.Query(stmt, post_id)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	reports := []*models.Report{}
+
+	for rows.Next() {
+		s := &models.Report{}
+		err = rows.Scan(&s.Id, &s.PostId, &s.ModeratorId, &s.Reason, &s.Status, &s.Created)
+		if err != nil {
+			return nil, err
+		}
+		reports = append(reports, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return reports, nil
+}
+
+func (sq *Sqlite) ChangeReportStatus(report_id int) error {
+	stmt := `UPDATE reports SET status = 'Resolved' 
+	WHERE id = ? AND status = 'Pending';`
+
+	_, err := sq.DB.Exec(stmt, report_id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

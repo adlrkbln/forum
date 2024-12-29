@@ -50,6 +50,7 @@ h2{
 
 a{
     text-decoration: none;
+    
 
 }
 a:hover{
@@ -125,7 +126,7 @@ nav a.live:after{
 
 }
 a.button:hover, input[type="submit"]:hover{
-    background-color: #4eb722;
+    background-color: rgb(166, 92, 251);
     color: #ffffff;
     cursor: pointer;
     text-decoration: none;
@@ -179,11 +180,11 @@ button{
     background: none;
     padding: 0;
     border: none;
-    color: aliceblue;
+    color: #494949;
     text-decoration: none;
 }
 button:hover{
-    color: #4eb722;
+    color: rgb(166, 92, 251);
     text-decoration: underline;
     cursor: pointer;
 }
