@@ -9,4 +9,5 @@ type TemplateData struct {
 	User            *User
 	Form            any
 	IsAuthenticated bool
+	IsModerator     bool
 }

@@ -148,3 +148,20 @@ func (h *Handler) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+func (h *Handler) accountPageGet(w http.ResponseWriter, r *http.Request) {
+	user, err := h.service.GetUser(r) // Retrieve user info from session
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	data, err := h.NewTemplateData(w, r)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	data.User = user
+
+	h.Render(w, http.StatusOK, "account.tmpl", data)
+}

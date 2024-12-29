@@ -70,3 +70,9 @@ func (s *service) GetUser(r *http.Request) (*models.User, error) {
 	}
 	return s.repo.GetUserByID(userID)
 }
+
+func (s *service) ReportPost(moderator_id int, post_id int, reason string) error {
+	err := s.repo.InsertReportPost(moderator_id, post_id, reason)
+
+	return err
+}

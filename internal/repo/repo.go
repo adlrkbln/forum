@@ -20,6 +20,7 @@ type PostModel interface {
 	InsertComment(post_id int, user_id int, content string) error
 	GetCreatedPosts(user_id int) ([]*models.Post, error)
 	GetLikedPosts(user_id int) ([]*models.Post, error)
+	InsertReportPost(moderator_id int, post_id int, reason string) error
 }
 
 type UserModel interface {

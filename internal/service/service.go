@@ -42,4 +42,5 @@ type User interface {
 	GetUser(r *http.Request) (*models.User, error)
 	DeleteSession(token string) error
 	IsSessionValid(token string) bool
+	ReportPost(moderatorId int, postId int, reason string) error
 }

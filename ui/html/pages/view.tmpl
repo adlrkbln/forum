@@ -21,8 +21,37 @@
             <input type="hidden" name="PostId" value="{{.Id}}">
             <button type='submit' class="dislike-button">👎 Dislike ({{.Dislikes}})</button>
         </form>
+        
         </div>
     </div>
+    {{end}}
+    {{if .IsModerator}}
+        <div class="post-comment">
+            <h3>Report post</h3>
+            <form action="/moderator/report" method="POST">
+                <input type="hidden" name="post_id" value="{{.Post.Id}}">
+                <textarea name="reason" placeholder="Reason for reporting" required></textarea>
+                <div>
+                    <input type='submit' value='Report'>
+                </div>
+            </form>
+        </div>
+    {{end}}
+    {{if .IsAuthenticated}}
+        <div class="post-comment">
+            <h3>Post a Comment</h3>
+            <form action="/post/comment" method="POST">
+                <input type="hidden" name="PostId" value="{{.Post.Id}}">
+                <textarea name="content" rows="4" cols="50" placeholder="Your comment..." required></textarea><br>
+                <div>
+                    <input type='submit' value='Post Comment'>
+                </div>
+            </form>
+        </div>
+    {{else}}
+        <p>You must be logged in to post a comment.</p>
+    {{end}}
+    {{with .Post}}
     <div class="comments">
         <strong>Comments</strong>
         {{if .Comments}}
@@ -52,19 +81,5 @@
             <p>There's nothing to see here... yet!</p><br><br>
         {{end}}
     </div>
-    {{end}}
-    {{if .IsAuthenticated}}
-        <div class="post-comment">
-            <h3>Post a Comment</h3>
-            <form action="/post/comment" method="POST">
-                <input type="hidden" name="PostId" value="{{.Post.Id}}">
-                <textarea name="content" rows="4" cols="50" placeholder="Your comment..." required></textarea><br>
-                <div>
-                    <input type='submit' value='Post Comment'>
-                </div>
-            </form>
-        </div>
-    {{else}}
-        <p>You must be logged in to post a comment.</p>
     {{end}}
 {{end}}

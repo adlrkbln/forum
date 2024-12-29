@@ -1,0 +1,41 @@
+{{define "title"}}Profile{{end}}
+
+{{define "main"}}
+<div class="container">
+    {{with .User}}
+    <h2>Profile Details</h2>
+    <div class="profile-info">
+        <p><strong>Username:</strong> {{.Name}}</p>
+        <p><strong>Email:</strong> {{.Email}}</p>
+        <p><strong>Role:</strong> {{.Role}}</p>
+    </div>
+
+    {{if eq .Role "User"}}
+    <div class="user-actions">
+        <h3>Actions</h3>
+        <form action="/moderator/request" method="POST">
+            <button type="submit">Request Moderator Role</button>
+        </form>
+    </div>
+    {{end}}
+
+    {{if eq .Role "Moderator"}}
+    <div class="moderator-actions">
+        <h3>Moderator Actions</h3>
+        <a href="/moderator/reports">View Reports</a>
+    </div>
+    {{end}}
+
+    {{if eq .Role "Admin"}}
+    <div class="admin-actions">
+        <h3>Admin Actions</h3>
+        <ul>
+            <li><a href="/admin/reports">View and Respond to Reports</a></li>
+            <li><a href="/admin/manage-users">Manage Users</a></li>
+            <li><a href="/admin/categories">Manage Categories</a></li>
+        </ul>
+    </div>
+    {{end}}
+    {{end}}
+</div>
+{{end}}

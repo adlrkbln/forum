@@ -57,6 +57,24 @@ func (h *Handler) RequireAuthentication(next http.HandlerFunc) http.HandlerFunc 
 	})
 }
 
+func (h *Handler) RequireModerator(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sessionCookie := cookies.GetSessionCookie("session_id", r)
+		if sessionCookie == nil || !h.service.IsSessionValid(sessionCookie.Value) {
+			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+			return
+		}
+
+		user, err := h.service.GetUser(r)
+		if err != nil || user.Role != "Moderator" {
+			http.Error(w, "Forbidden: Moderator access required", http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 type client struct {
 	limiter  *rateLimiter
 	lastSeen time.Time

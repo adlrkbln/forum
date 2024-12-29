@@ -56,6 +56,7 @@ func OpenDB(dsn string) (*Sqlite, error) {
 			email TEXT NOT NULL,
 			hashed_password CHAR(60) NOT NULL,
 			created DATETIME NOT NULL,
+			role TEXT NOT NULL DEFAULT 'User',
 			UNIQUE(email)
 		);`,
 		`CREATE TABLE IF NOT EXISTS comments (
@@ -68,6 +69,16 @@ func OpenDB(dsn string) (*Sqlite, error) {
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (post_id) REFERENCES posts(id),
 			FOREIGN KEY (user_id) REFERENCES users(id)
+		);`,
+		`CREATE TABLE IF NOT EXISTS reports (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			post_id INTEGER NOT NULL,
+			moderator_id INTEGER NOT NULL,
+			reason TEXT NOT NULL,
+			status TEXT NOT NULL DEFAULT 'Pending', -- Status: Pending, Resolved
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY(post_id) REFERENCES posts(id),
+			FOREIGN KEY(moderator_id) REFERENCES users(id)
 		);`,
 		`CREATE TABLE IF NOT EXISTS category (
 			id INTEGER PRIMARY KEY,

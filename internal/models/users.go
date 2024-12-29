@@ -10,6 +10,7 @@ type User struct {
 	Name           string
 	Email          string
 	HashedPassword []byte
+	Role           string
 	Created        time.Time
 }
 
@@ -21,7 +22,16 @@ type UserSignupForm struct {
 }
 
 type UserLoginForm struct {
-	Email               string `form:"email"`
-	Password            string `form:"password"`
+	Email              string `form:"email"`
+	Password           string `form:"password"`
 	validate.Validator `form:"-"`
+}
+
+type Report struct {
+	Id          int
+	PostId      int
+	ModeratorId int
+	Reason      string
+	Status      string // "Pending", "Resolved"
+	CreatedAt   time.Time
 }

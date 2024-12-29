@@ -10,6 +10,9 @@
     <div>
         <!-- Toggle the links based on authentication status -->
         {{if .IsAuthenticated}}
+            <form action='/user/profile' method='POST'>
+                <button>Profile</button>
+            </form>
             <form action='/user/logout' method='POST'>
                 <button>Logout</button>
             </form>

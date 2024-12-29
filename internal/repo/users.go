@@ -72,10 +72,15 @@ func (sq *Sqlite) Exists(id int) (bool, error) {
 
 func (sq *Sqlite) GetUserByID(id int) (*models.User, error) {
 	var u models.User
-	stmt := `SELECT id, name, email, created FROM users WHERE id=?`
-	err := sq.DB.QueryRow(stmt, id).Scan(&u.Id, &u.Name, &u.Email, &u.Created)
+	stmt := `SELECT id, name, email, created, role FROM users WHERE id=?`
+	err := sq.DB.QueryRow(stmt, id).Scan(&u.Id, &u.Name, &u.Email, &u.Created, &u.Role)
 	if err != nil {
 		return nil, err
 	}
 	return &u, nil
+}
+
+func (sq *Sqlite) InsertReportPost(moderator_id int, post_id int, reason string) error {
+	_, err := sq.DB.Exec("INSERT INTO reports (post_id, moderator_id, reason) VALUES (?, ?, ?)", post_id, moderator_id, reason)
+	return err
 }
