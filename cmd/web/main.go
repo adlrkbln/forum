@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"forum/internal/app"
 	"forum/internal/handlers"
 	"forum/internal/repo"
@@ -8,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -32,13 +34,25 @@ func main() {
 	service := service.NewService(db)
 	handlers := handlers.New(app, service)
 
-	srv := &http.Server{
-		Addr:     ":8080",
-		ErrorLog: errorLog,
-		Handler:  handlers.Routes(),
+	tlsConfig := &tls.Config{
+		PreferServerCipherSuites: true,
+		CurvePreferences: []tls.CurveID{
+			tls.CurveP256,
+			tls.CurveP384,
+		},
 	}
 
-	infoLog.Print("Starting server on http://localhost:8080")
-	err = srv.ListenAndServe()
+	srv := &http.Server{
+		Addr:         ":8080",
+		ErrorLog:     errorLog,
+		Handler:      handlers.RateLimiter(handlers.Routes()),
+		TLSConfig:    tlsConfig,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+
+	infoLog.Print("Starting server on https://localhost:8080")
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errorLog.Fatal(err)
 }

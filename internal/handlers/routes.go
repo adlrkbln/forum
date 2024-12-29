@@ -10,19 +10,18 @@ func (h *Handler) Routes() http.Handler {
 
 	mux.HandleFunc("/", h.home)
 	mux.HandleFunc("/post/view", h.postView)
-	mux.HandleFunc("/liked", h.requireAuthentication(h.likedPosts))
-	mux.HandleFunc("/post/create", h.requireAuthentication(h.postCreate))
-	mux.HandleFunc("/post/comment", h.requireAuthentication(h.commentPost))
-	mux.HandleFunc("/post/like", h.requireAuthentication(h.likePost))
-	mux.HandleFunc("/post/dislike", h.requireAuthentication(h.dislikePost))
-	
-	mux.HandleFunc("/comment/like", h.requireAuthentication(h.likeComment))
-	mux.HandleFunc("/comment/dislike", h.requireAuthentication(h.dislikeComment))
+	mux.HandleFunc("/liked", h.RequireAuthentication(h.likedPosts))
+	mux.HandleFunc("/post/create", h.RequireAuthentication(h.postCreate))
+	mux.HandleFunc("/post/comment", h.RequireAuthentication(h.commentPost))
+	mux.HandleFunc("/post/like", h.RequireAuthentication(h.likePost))
+	mux.HandleFunc("/post/dislike", h.RequireAuthentication(h.dislikePost))
+
+	mux.HandleFunc("/comment/like", h.RequireAuthentication(h.likeComment))
+	mux.HandleFunc("/comment/dislike", h.RequireAuthentication(h.dislikeComment))
 
 	mux.HandleFunc("/user/signup", h.userSignup)
-    mux.HandleFunc("/user/login", h.userLogin)
-    mux.HandleFunc("/user/logout", h.requireAuthentication(h.userLogoutPost))
+	mux.HandleFunc("/user/login", h.userLogin)
+	mux.HandleFunc("/user/logout", h.RequireAuthentication(h.userLogoutPost))
 
-	
-	return h.recoverPanic(h.logRequest(secureHeaders(mux)))
+	return h.RecoverPanic(h.LogRequest(SecureHeaders(mux)))
 }
