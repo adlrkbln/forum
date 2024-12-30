@@ -15,4 +15,5 @@ type TemplateData struct {
 	Form              any
 	IsAuthenticated   bool
 	IsModerator       bool
+	IsAdmin           bool
 }

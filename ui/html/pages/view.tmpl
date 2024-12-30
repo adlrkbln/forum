@@ -21,7 +21,12 @@
             <input type="hidden" name="PostId" value="{{.Id}}">
             <button type='submit' class="dislike-button">👎 Dislike ({{.Dislikes}})</button>
         </form>
-        
+        {{end}}
+        {{if .IsAdmin}}
+            <form action="/admin/delete-post" method="POST">
+                <input type="hidden" name="PostId" value="{{.Post.Id}}">
+                <button type='submit' class="delete-button">🗑 Delete Post</button>
+            </form>
         </div>
     </div>
     {{end}}
@@ -73,9 +78,16 @@
                             <input type="hidden" name="CommentId" value="{{.Id}}">
                             <button type='submit' class="dislike-button">👎 ({{.Dislikes}})</button>
                         </form>
+                        {{if $.IsAdmin}}
+                            <form action="/admin/delete-comment" method="POST">
+                                <input type="hidden" name="CommentId" value="{{.Id}}">
+                                <button type='submit' class="delete-button">🗑 Delete Comment</button>
+                            </form>
+                        {{end}}
                     </div>
                 </div>
                 {{end}}
+                
             </div>
         {{else}}
             <p>There's nothing to see here... yet!</p><br><br>

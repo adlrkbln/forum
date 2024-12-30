@@ -26,12 +26,15 @@ func (h *Handler) Routes() http.Handler {
 
 	mux.HandleFunc("/moderator/request", h.RequireAuthentication(h.userRequestModerator))
 	mux.HandleFunc("/moderator/report", h.RequireModerator(h.reportPost))
+
 	mux.HandleFunc("/admin/delete-post", h.RequireAdmin(h.deletePost))
+	mux.HandleFunc("/admin/delete-comment", h.RequireAdmin(h.deleteComment))
 	mux.HandleFunc("/admin/ignore-report", h.RequireAdmin(h.ignoreReport))
 	mux.HandleFunc("/admin/promote", h.RequireAdmin(h.promoteUserToModerator))
 	mux.HandleFunc("/admin/deny", h.RequireAdmin(h.denyModeratorRequest))
 	mux.HandleFunc("/admin/demote", h.RequireAdmin(h.demoteModerator))
-	mux.HandleFunc("/admin/categories", h.RequireAdmin(h.AdminManageCategories))
+	mux.HandleFunc("/admin/categories", h.RequireAdmin(h.addCategories))
+	mux.HandleFunc("/admin/delete-category", h.RequireAdmin(h.deleteCategory))
 
 	return h.RecoverPanic(h.LogRequest(SecureHeaders(mux)))
 }

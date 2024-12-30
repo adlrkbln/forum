@@ -160,3 +160,12 @@ func CommentExists(commentId int, comments []*models.Comment) bool {
 	}
 	return false
 }
+
+func UserExists(userId int, users []*models.User) bool {
+	for _, user := range users {
+		if user.Id == userId {
+			return true
+		}
+	}
+	return false
+}

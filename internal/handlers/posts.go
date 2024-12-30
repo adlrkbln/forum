@@ -219,10 +219,15 @@ func (h *Handler) reportPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	posts, err := h.service.GetAllPosts()
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
 
 	post_idStr := r.FormValue("post_id")
 	post_id, err := strconv.Atoi(post_idStr)
-	if err != nil || post_id < 1 {
+	if err != nil || post_id < 1 || !PostExists(post_id, posts) {
 		h.NotFound(w)
 		return
 	}
@@ -253,12 +258,20 @@ func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	post_idStr := r.FormValue("post_id")
+
+	posts, err := h.service.GetAllPosts()
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	post_idStr := r.FormValue("PostId")
 	post_id, err := strconv.Atoi(post_idStr)
-	if err != nil || post_id < 1 {
+	if err != nil || post_id < 1 || !PostExists(post_id, posts) {
 		h.NotFound(w)
 		return
 	}
+
 	user, err := h.service.GetUser(r)
 	if err != nil {
 		h.ServerError(w, err)

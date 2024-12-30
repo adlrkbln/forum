@@ -49,7 +49,8 @@ func (h *Handler) NewTemplateData(w http.ResponseWriter, r *http.Request) (*mode
 
 	TemplateData.IsAuthenticated = h.IsAuthenticated(r)
 	TemplateData.IsModerator = h.IsModerator(r)
-	
+	TemplateData.IsAdmin = h.IsAdmin(r)
+
 	if TemplateData.IsAuthenticated {
 		user, err := h.service.GetUser(r)
 		if err != nil {
@@ -79,6 +80,17 @@ func (h *Handler) IsModerator(r *http.Request) bool {
 	if cookie != nil && h.service.IsSessionValid(cookie.Value) {
 		user, err := h.service.GetUser(r)
 		if err == nil && user.Role == "Moderator" {
+			return true
+		}
+	}
+	return false
+}
+
+func (h *Handler) IsAdmin(r *http.Request) bool {
+	cookie := cookies.GetSessionCookie("session_id", r)
+	if cookie != nil && h.service.IsSessionValid(cookie.Value) {
+		user, err := h.service.GetUser(r)
+		if err == nil && user.Role == "Admin" {
 			return true
 		}
 	}

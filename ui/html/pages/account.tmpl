@@ -177,7 +177,7 @@
             {{range .Categories}}
             <li>
                 {{.Name}}
-                <form action="/admin/categories" method="post" style="display:inline;">
+                <form action="/admin/delete-category" method="post" style="display:inline;">
                     <input type="hidden" name="_method" value="DELETE">
                     <input type="hidden" name="category_id" value="{{.Id}}">
                     <button type="submit">Delete</button>

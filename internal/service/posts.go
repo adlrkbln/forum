@@ -79,7 +79,7 @@ func (s *service) DeletePost(post_id int) error {
 
 	reports, err := s.repo.FindReportsForPost(post_id)
 	for _, report := range reports {
-		err = s.repo.ChangeReportStatus(report.Id) 
+		err = s.repo.ChangeReportStatus(report.Id)
 		if err != nil {
 			return err
 		}
@@ -89,9 +89,13 @@ func (s *service) DeletePost(post_id int) error {
 }
 
 func (s *service) IgnoreReport(report_id int) error {
-	err := s.repo.ChangeReportStatus(report_id) 
+	err := s.repo.ChangeReportStatus(report_id)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (s *service) DeleteComment(commentID int) error {
+	return s.repo.DeleteComment(commentID)
 }

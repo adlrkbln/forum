@@ -203,7 +203,7 @@ func (h *Handler) accountPageGet(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		data.Users = users
-		
+
 		data.Form = models.UserLoginForm{}
 		categories, err := h.service.GetCategories()
 		if err != nil {
@@ -280,15 +280,20 @@ func (h *Handler) demoteModerator(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	users, err := h.service.GetAllUsers()
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	userID, err := strconv.Atoi(r.PostFormValue("id"))
+	if err != nil || userID < 1 || !UserExists(userID, users) {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
+	
 	admin, err := h.service.GetUser(r)
 	if err != nil || admin.Role != "Admin" {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-
-	userID, err := strconv.Atoi(r.PostFormValue("id"))
-	if err != nil {
-		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
 
@@ -299,4 +304,41 @@ func (h *Handler) demoteModerator(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
+}
+
+func (h *Handler) deleteComment(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	comments, err := h.service.GetAllComments()
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	commentID, err := strconv.Atoi(r.FormValue("CommentId"))
+	if err != nil || commentID <= 0 || !CommentExists(commentID, comments) {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	user, err := h.service.GetUser(r)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	if user.Role != "Admin" {
+		http.Error(w, "Forbidden: Admin access required", http.StatusForbidden)
+		return
+	}
+
+	if err := h.service.DeleteComment(commentID); err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, r.Referer(), http.StatusSeeOther)
 }

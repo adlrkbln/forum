@@ -38,6 +38,7 @@ type Post interface {
 	IgnoreReport(report_id int) error
 	DeleteCategory(id int) error
 	CreateCategory(form models.CategoryCreateForm) error 
+	DeleteComment(commentID int) error 
 }
 
 type User interface {

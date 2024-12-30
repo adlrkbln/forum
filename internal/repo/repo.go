@@ -23,6 +23,7 @@ type PostModel interface {
 	DeletePost(post_id int) error
 	FindReportsForPost(post_id int) ([]*models.Report, error)
 	ChangeReportStatus(report_id int) error
+	DeleteComment(commentID int) error
 }
 
 type UserModel interface {
