@@ -80,6 +80,27 @@ func (sq *Sqlite) GetUserByID(id int) (*models.User, error) {
 	return &u, nil
 }
 
+func (sq *Sqlite) GetAllUsers() ([]*models.User, error) {
+	stmt := `SELECT id, name, email, role FROM users 
+	WHERE role = 'User' OR role = 'Moderator'
+	ORDER BY role, name `
+	rows, err := sq.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []*models.User
+	for rows.Next() {
+		u := &models.User{}
+		if err := rows.Scan(&u.Id, &u.Name, &u.Email, &u.Role); err != nil {
+			return nil, err
+		}
+		users = append(users, u)
+	}
+	return users, nil
+}
+
 func (sq *Sqlite) InsertReportPost(moderator_id int, post_id int, reason string) error {
 	_, err := sq.DB.Exec("INSERT INTO reports (post_id, moderator_id, reason) VALUES (?, ?, ?)", post_id, moderator_id, reason)
 	return err
@@ -165,7 +186,7 @@ func (sq *Sqlite) PromoteUserToModerator(request_id int) error {
         return err
     }
 
-    _, err = tx.Exec("UPDATE moderator_requests SET status = 'Approved' WHERE id = ?", request_id)
+    _, err = tx.Exec("UPDATE moderator_requests SET status = 'Approved' WHERE user_id = ?", user_id)
     if err != nil {
         tx.Rollback()
         return err
@@ -232,4 +253,10 @@ func (sq *Sqlite) GetModeratorReports(user_id int) ([]*models.Report, error) {
 	}
 
 	return reports, nil
+}
+
+func (sq *Sqlite) DemoteModerator(userID int) error {
+	query := "UPDATE users SET role = 'User' WHERE id = ? AND role = 'Moderator'"
+	_, err := sq.DB.Exec(query, userID)
+	return err
 }

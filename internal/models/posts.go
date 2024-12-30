@@ -31,6 +31,11 @@ type Category struct {
 	Name string
 }
 
+type CategoryCreateForm struct {
+	Name              string
+	validate.Validator `form:"-"`
+}
+
 type Comment struct {
 	Id       int
 	PostId   int

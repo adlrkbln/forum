@@ -30,6 +30,7 @@ type UserModel interface {
 	InsertUser(name, email, password string) error
 	Exists(id int) (bool, error)
 	GetUserByID(id int) (*models.User, error)
+	GetAllUsers() ([]*models.User, error)
 	InsertReportPost(moderator_id int, post_id int, reason string) error
 	GetAllReports() ([]*models.Report, error)
 	RequestModeratorRole(user_id int) error
@@ -38,6 +39,7 @@ type UserModel interface {
 	PromoteUserToModerator(request_id int) error
 	GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error)
 	GetModeratorReports(user_id int) ([]*models.Report, error)
+	DemoteModerator(userID int) error
 }
 
 type Session interface {
@@ -51,6 +53,8 @@ type Session interface {
 type Category interface {
 	GetCategories() ([]*models.Category, error)
 	PostCategoryPost(post_id int, category_id int) error
+	CreateCategory(name string) error
+	DeleteCategory(id int) error
 }
 
 type Reaction interface {

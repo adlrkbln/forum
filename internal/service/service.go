@@ -36,12 +36,15 @@ type Post interface {
 	AddDislikeComment(comment_id, user_id int) error
 	DeletePost(post_id int) error
 	IgnoreReport(report_id int) error
+	DeleteCategory(id int) error
+	CreateCategory(form models.CategoryCreateForm) error 
 }
 
 type User interface {
 	InsertUser(name, email, password string) error
 	AuthenticateUser(form models.UserLoginForm, data *models.TemplateData) (*models.Session, *models.TemplateData, error)
 	GetUser(r *http.Request) (*models.User, error)
+	GetAllUsers() ([]*models.User, error)
 	DeleteSession(token string) error
 	IsSessionValid(token string) bool
 	ReportPost(moderatorId int, postId int, reason string) error
@@ -52,4 +55,5 @@ type User interface {
 	PromoteUserToModerator(request_id int) error 
 	GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error)
 	GetModeratorReports(user_id int) ([]*models.Report, error)
+	DemoteModerator(userID int) error
 }

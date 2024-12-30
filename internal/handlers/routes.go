@@ -30,6 +30,8 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("/admin/ignore-report", h.RequireAdmin(h.ignoreReport))
 	mux.HandleFunc("/admin/promote", h.RequireAdmin(h.promoteUserToModerator))
 	mux.HandleFunc("/admin/deny", h.RequireAdmin(h.denyModeratorRequest))
+	mux.HandleFunc("/admin/demote", h.RequireAdmin(h.demoteModerator))
+	mux.HandleFunc("/admin/categories", h.RequireAdmin(h.AdminManageCategories))
 
 	return h.RecoverPanic(h.LogRequest(SecureHeaders(mux)))
 }

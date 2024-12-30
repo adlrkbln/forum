@@ -196,6 +196,21 @@ func (h *Handler) accountPageGet(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		data.ModeratorRequests = requests
+
+		users, err := h.service.GetAllUsers()
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		data.Users = users
+		
+		data.Form = models.UserLoginForm{}
+		categories, err := h.service.GetCategories()
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		data.Categories = categories
 	}
 
 	h.Render(w, http.StatusOK, "account.tmpl", data)
@@ -257,4 +272,31 @@ func (h *Handler) denyModeratorRequest(w http.ResponseWriter, r *http.Request) {
     }
 
     http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
+}
+
+func (h *Handler) demoteModerator(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	admin, err := h.service.GetUser(r)
+	if err != nil || admin.Role != "Admin" {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	userID, err := strconv.Atoi(r.PostFormValue("id"))
+	if err != nil {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	err = h.service.DemoteModerator(userID)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
 }

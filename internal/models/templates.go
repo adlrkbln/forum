@@ -7,6 +7,7 @@ type TemplateData struct {
 	Category          *Category
 	Categories        []*Category
 	User              *User
+	Users             []*User
 	Report            *Report
 	Reports           []*Report
 	ModeratorRequest  *ModeratorRequest

@@ -37,7 +37,7 @@ func (sq *Sqlite) GetPostByCategory(id int) ([]*models.Post, error) {
 
 	rows, err := sq.DB.Query(stmt, id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetPostByCategory: %w", err)
 	}
 
 	defer rows.Close()
@@ -48,13 +48,13 @@ func (sq *Sqlite) GetPostByCategory(id int) ([]*models.Post, error) {
 		s := &models.Post{}
 		err = rows.Scan(&s.Id, &s.UserId, &s.Title, &s.Content, &s.Created)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetPostByCategory: %w", err)
 		}
 		posts = append(posts, s)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetPostByCategory: %w", err)
 	}
 
 	return posts, nil
@@ -66,8 +66,26 @@ func (sq *Sqlite) PostCategoryPost(post_id int, category_id int) error {
 
 	_, err := sq.DB.Exec(stmt, category_id, post_id)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.PostCategoryPost: %w", err)
 	}
 
+	return nil
+}
+
+func (sq *Sqlite) CreateCategory(name string) error {
+	stmt := `INSERT INTO category (name) VALUES (?);`
+	_, err := sq.DB.Exec(stmt, name)
+	if err != nil {
+		return fmt.Errorf("repo.CreateCategory: %w", err)
+	}
+	return nil
+}
+
+func (sq *Sqlite) DeleteCategory(id int) error {
+	stmt := `DELETE FROM category WHERE id = ?;`
+	_, err := sq.DB.Exec(stmt, id)
+	if err != nil {
+		return fmt.Errorf("repo.DeleteCategory: %w", err)
+	}
 	return nil
 }

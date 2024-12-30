@@ -44,6 +44,10 @@ func (s *service) Exists(id int) (bool, error) {
 	return s.repo.Exists(id)
 }
 
+func (s *service) GetAllUsers() ([]*models.User, error) {
+	return s.repo.GetAllUsers()
+}
+
 func (s *service) DeleteSession(token string) error {
 	if err := s.repo.DeleteSessionByToken(token); err != nil {
 		return err
@@ -122,4 +126,8 @@ func (s *service) GetModeratorReports(user_id int) ([]*models.Report, error) {
 		return nil, err
 	}
 	return reports, nil
+}
+
+func (s *service) DemoteModerator(userID int) error {
+	return s.repo.DemoteModerator(userID)
 }

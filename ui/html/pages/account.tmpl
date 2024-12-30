@@ -61,6 +61,38 @@
     
     {{end}}
     {{if eq .User.Role "Admin"}}
+    <div class="users-list">
+        <h2>All Users</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Users}}
+                <tr>
+                    <td>{{.Id}}</td>
+                    <td>{{.Name}}</td>
+                    <td>{{.Email}}</td>
+                    <td>{{.Role}}</td>
+                    <td>
+                        {{if eq .Role "Moderator"}}
+                        <form method="POST" action="/admin/demote">
+                            <input type="hidden" name="id" value="{{.Id}}">
+                            <button type="submit">Demote</button>
+                        </form>
+                        {{end}}
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div><br><br>
     <div class="admin-reports">
         <h3>Reports</h3>
         {{if .Reports}}
@@ -132,6 +164,27 @@
         {{else}}
         <p>No pending moderator requests.</p>
         {{end}}
+        <br><br><h2>Manage Categories</h2>
+        <form action="/admin/categories" method="post">
+            <label for="category_name">New Category:</label>
+            {{with .Form.FieldErrors.name}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type="text" id="category_name" name="category_name" required>
+            <button type="submit">Create</button>
+        </form>
+        <ul>
+            {{range .Categories}}
+            <li>
+                {{.Name}}
+                <form action="/admin/categories" method="post" style="display:inline;">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="category_id" value="{{.Id}}">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+            {{end}}
+        </ul>
     </div>
     {{end}}
 </div>
