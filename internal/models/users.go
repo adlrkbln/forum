@@ -36,3 +36,11 @@ type Report struct {
 	Status        string // "Pending", "Resolved"
 	Created       time.Time
 }
+
+type ModeratorRequest struct {
+	Id          int
+	UserId      int
+	Username    string
+	Status      string
+	RequestedAt string
+}

@@ -46,4 +46,10 @@ type User interface {
 	IsSessionValid(token string) bool
 	ReportPost(moderatorId int, postId int, reason string) error
 	GetAllReports() ([]*models.Report, error)
+	RequestModeratorRole(user_id int) error
+	GetAllRequests() ([]*models.ModeratorRequest, error)
+	DenyModeratorRequest(request_id int) error
+	PromoteUserToModerator(request_id int) error 
+	GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error)
+	GetModeratorReports(user_id int) ([]*models.Report, error)
 }

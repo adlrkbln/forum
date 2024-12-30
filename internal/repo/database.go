@@ -80,6 +80,13 @@ func OpenDB(dsn string) (*Sqlite, error) {
 			FOREIGN KEY(post_id) REFERENCES posts(id),
 			FOREIGN KEY(moderator_id) REFERENCES users(id)
 		);`,
+		`CREATE TABLE IF NOT EXISTS moderator_requests (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			status TEXT NOT NULL DEFAULT 'Pending', -- Pending, Approved, Denied
+			requested_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+		);`,
 		`CREATE TABLE IF NOT EXISTS category (
 			id INTEGER PRIMARY KEY,
 			name TEXT NOT NULL

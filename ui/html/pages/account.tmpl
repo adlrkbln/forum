@@ -14,14 +14,51 @@
         <form action="/moderator/request" method="POST">
             <button type="submit">Request Moderator Role</button>
         </form>
+    </div><br><br>
+    <div class="user-actions">
+        <h3>Your Moderator Requests</h3>
+        {{if .ModeratorRequests}}
+            <table>
+                <tr>
+                    <th>Status</th>
+                    <th>Requested At</th>
+                </tr>
+                {{range .ModeratorRequests}}
+                <tr>
+                    <td>{{.Status}}</td>
+                    <td>{{.RequestedAt}}</td>
+                </tr>
+                {{end}}
+            </table>
+        {{else}}
+            <p>You haven't requested moderator access yet.</p>
+        {{end}}
     </div>
     {{end}}
 
     {{if eq .User.Role "Moderator"}}
     <div class="moderator-actions">
-        <h3>Moderator Actions</h3>
-        <a href="/moderator/reports">View Reports</a>
+        <h3>Your Reports</h3>
+        {{if .Reports}}
+            <table>
+                <tr>
+                    <th>Post ID</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                </tr>
+                {{range .Reports}}
+                <tr>
+                    <td><a href="/post/view?id={{.PostId}}">{{.PostId}}</a></td>
+                    <td>{{.Reason}}</td>
+                    <td>{{.Status}}</td>
+                </tr>
+                {{end}}
+            </table>
+        {{else}}
+            <p>You haven't submitted any reports yet.</p>
+        {{end}}
     </div>
+    
     {{end}}
     {{if eq .User.Role "Admin"}}
     <div class="admin-reports">
@@ -60,6 +97,40 @@
         </table>
         {{else}}
         <p>No reports to display.</p>
+        {{end}}
+    </div><br><br>
+    <div class="admin-actions">
+        <h3>Moderator Requests</h3>
+        {{if .ModeratorRequests}}
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                {{range .ModeratorRequests}}
+                <tr>
+                    <td>{{.Username}}</td>
+                    <td>{{.Status}}</td>
+                    {{if eq .Status "Pending"}}
+                    <td>
+                        <form action="/admin/promote" method="POST">
+                            <input type="hidden" name="id" value="{{.Id}}">
+                            <button type="submit">Promote</button>
+                        </form>
+                        <form action="/admin/deny" method="POST">
+                            <input type="hidden" name="id" value="{{.Id}}">
+                            <button type="submit">Deny</button>
+                        </form>
+                    </td>
+                    {{else}}
+                        <td>None</td>
+                    {{end}}
+                </tr>
+                {{end}}
+            </table>
+        {{else}}
+        <p>No pending moderator requests.</p>
         {{end}}
     </div>
     {{end}}

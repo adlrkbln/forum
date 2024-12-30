@@ -84,3 +84,42 @@ func (s *service) GetAllReports() ([]*models.Report, error) {
 	}
 	return reports, nil
 }
+
+func (s *service) RequestModeratorRole(user_id int) error {
+	err := s.repo.RequestModeratorRole(user_id)
+	return err
+}
+
+func (s *service) GetAllRequests() ([]*models.ModeratorRequest, error) {
+	requests, err := s.repo.GetAllRequests()
+	if err != nil {
+		return nil, err
+	}
+	return requests, err
+}
+
+func (s *service) PromoteUserToModerator(request_id int) error {
+	err := s.repo.PromoteUserToModerator(request_id)
+	return err
+}
+
+func (s *service) DenyModeratorRequest(request_id int) error {
+	err := s.repo.DenyModeratorRequest(request_id)
+	return err
+}
+
+func (s *service) GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error) {
+	requests, err := s.repo.GetUserModeratorRequests(user_id)
+	if err != nil {
+		return nil, err
+	}
+	return requests, nil
+}
+
+func (s *service) GetModeratorReports(user_id int) ([]*models.Report, error) {
+	reports, err := s.repo.GetModeratorReports(user_id)
+	if err != nil {
+		return nil, err
+	}
+	return reports, nil
+}

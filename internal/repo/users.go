@@ -114,3 +114,122 @@ func (sq *Sqlite) GetAllReports() ([]*models.Report, error) {
 
 	return reports, nil
 }
+
+func (sq *Sqlite) RequestModeratorRole(user_id int) error {
+	stmt := "INSERT INTO moderator_requests (user_id, status) VALUES (?, 'Pending')"
+	_, err := sq.DB.Exec(stmt, user_id)
+	return err
+}
+
+
+func (sq *Sqlite) GetAllRequests() ([]*models.ModeratorRequest, error) {
+    stmt := `
+        SELECT r.id, r.user_id, u.name AS username, r.status, r.requested_at
+        FROM moderator_requests r
+        JOIN users u ON r.user_id = u.id
+		ORDER BY r.id DESC
+    `
+    rows, err := sq.DB.Query(stmt)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var requests []*models.ModeratorRequest
+    for rows.Next() {
+        s := &models.ModeratorRequest{}
+        if err := rows.Scan(&s.Id, &s.UserId, &s.Username, &s.Status, &s.RequestedAt); err != nil {
+            return nil, err
+        }
+        requests = append(requests, s)
+    }
+    return requests, nil
+}
+
+func (sq *Sqlite) PromoteUserToModerator(request_id int) error {
+    tx, err := sq.DB.Begin()
+    if err != nil {
+        return err
+    }
+
+    var user_id int
+    err = tx.QueryRow("SELECT user_id FROM moderator_requests WHERE id = ?", request_id).Scan(&user_id)
+    if err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    _, err = tx.Exec("UPDATE users SET role = 'Moderator' WHERE id = ?", user_id)
+    if err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    _, err = tx.Exec("UPDATE moderator_requests SET status = 'Approved' WHERE id = ?", request_id)
+    if err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    return tx.Commit()
+}
+
+func (sq *Sqlite) DenyModeratorRequest(request_id int) error {
+    query := "UPDATE moderator_requests SET status = 'Denied' WHERE id = ?"
+    _, err := sq.DB.Exec(query, request_id)
+    return err
+}
+
+func (sq *Sqlite) GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error) {
+	stmt := `SELECT r.id, r.user_id, u.name AS username, r.status, r.requested_at
+        FROM moderator_requests r
+        JOIN users u ON r.user_id = u.id
+        WHERE r.user_id = ?`
+	
+    rows, err := sq.DB.Query(stmt, user_id)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var requests []*models.ModeratorRequest
+    for rows.Next() {
+        s := &models.ModeratorRequest{}
+        if err := rows.Scan(&s.Id, &s.UserId, &s.Username, &s.Status, &s.RequestedAt); err != nil {
+            return nil, err
+        }
+        requests = append(requests, s)
+    }
+    return requests, nil
+}
+
+func (sq *Sqlite) GetModeratorReports(user_id int) ([]*models.Report, error) {
+	stmt := `SELECT r.id, r.post_id, r.moderator_id, u.name, r.reason, r.status, r.created_at FROM reports r
+	JOIN users u ON u.id = r.moderator_id
+	WHERE r.moderator_id = ?
+    ORDER BY r.id DESC`
+
+	rows, err := sq.DB.Query(stmt, user_id)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	reports := []*models.Report{}
+
+	for rows.Next() {
+		s := &models.Report{}
+		err = rows.Scan(&s.Id, &s.PostId, &s.ModeratorId, &s.ModeratorName, &s.Reason, &s.Status, &s.Created)
+		if err != nil {
+			return nil, err
+		}
+		reports = append(reports, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return reports, nil
+}

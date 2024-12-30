@@ -22,7 +22,7 @@ type PostModel interface {
 	GetLikedPosts(user_id int) ([]*models.Post, error)
 	DeletePost(post_id int) error
 	FindReportsForPost(post_id int) ([]*models.Report, error)
-	ChangeReportStatus(report_id int) error 
+	ChangeReportStatus(report_id int) error
 }
 
 type UserModel interface {
@@ -32,6 +32,12 @@ type UserModel interface {
 	GetUserByID(id int) (*models.User, error)
 	InsertReportPost(moderator_id int, post_id int, reason string) error
 	GetAllReports() ([]*models.Report, error)
+	RequestModeratorRole(user_id int) error
+	GetAllRequests() ([]*models.ModeratorRequest, error)
+	DenyModeratorRequest(request_id int) error
+	PromoteUserToModerator(request_id int) error
+	GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error)
+	GetModeratorReports(user_id int) ([]*models.Report, error)
 }
 
 type Session interface {
