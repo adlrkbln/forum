@@ -19,10 +19,11 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("/comment/like", h.RequireAuthentication(h.likeComment))
 	mux.HandleFunc("/comment/dislike", h.RequireAuthentication(h.dislikeComment))
 
-	mux.HandleFunc("/user/signup", h.userSignup)
-	mux.HandleFunc("/user/login", h.userLogin)
+	mux.HandleFunc("/user/signup", h.CheckGuest(h.userSignup))
+	mux.HandleFunc("/user/login", h.CheckGuest(h.userLogin))
 	mux.HandleFunc("/user/logout", h.RequireAuthentication(h.userLogoutPost))
 	mux.HandleFunc("/user/profile", h.RequireAuthentication(h.accountPageGet))
+	mux.HandleFunc("/notifications/read", h.RequireAuthentication(h.markNotificationRead))
 
 	mux.HandleFunc("/moderator/request", h.RequireAuthentication(h.userRequestModerator))
 	mux.HandleFunc("/moderator/report", h.RequireModerator(h.reportPost))

@@ -260,3 +260,21 @@ func (sq *Sqlite) DeleteComment(commentID int) error {
 	}
 	return nil
 }
+
+func (sq *Sqlite) GetPostAuthor(post_id int) (*models.User, error) {
+	stmt := `SELECT u.id from users u
+	JOIN posts p ON u.id = p.user_id 
+	WHERE p.id = ?`
+	row := sq.DB.QueryRow(stmt, post_id)
+
+	s := &models.User{}
+	err := row.Scan(&s.Id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, models.ErrNoRecord
+		} else {
+			return nil, err
+		}
+	}
+	return s, err
+}

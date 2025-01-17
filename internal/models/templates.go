@@ -12,6 +12,8 @@ type TemplateData struct {
 	Reports           []*Report
 	ModeratorRequest  *ModeratorRequest
 	ModeratorRequests []*ModeratorRequest
+	Notification      *Notification
+	Notifications     []*Notification
 	Form              any
 	IsAuthenticated   bool
 	IsModerator       bool

@@ -8,6 +8,7 @@ type Repo interface {
 	Session
 	Category
 	Reaction
+	Notification
 }
 
 type PostModel interface {
@@ -24,6 +25,7 @@ type PostModel interface {
 	FindReportsForPost(post_id int) ([]*models.Report, error)
 	ChangeReportStatus(report_id int) error
 	DeleteComment(commentID int) error
+	GetPostAuthor(post_id int) (*models.User, error)
 }
 
 type UserModel interface {
@@ -69,4 +71,12 @@ type Reaction interface {
 	CheckUserReactionComment(comment_id int, user_id int) (int, error)
 	InsertUserReactionComment(comment_id int, user_id int, reaction int) error
 	RemoveUserReactionComment(comment_id int, user_id int, reaction int) error
+}
+
+type Notification interface {
+	CreateNotification(notification *models.Notification) error
+	GetUnreadNotifications(userId int) ([]*models.Notification, error)
+	MarkNotificationAsRead(notificationId int) error
+	GetNotifications() ([]*models.Notification, error) 
+	
 }

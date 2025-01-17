@@ -50,6 +50,24 @@ func (s *service) InsertComment(post_id int, user_id int, content string) error 
 	if err != nil {
 		return err
 	}
+
+	user, err := s.repo.GetUserByID(user_id)
+	if err != nil {
+		return err
+	}
+	author, err := s.repo.GetPostAuthor(post_id)
+	if err != nil {
+		return err
+	}
+	if author.Id == user_id {
+		return nil
+	}
+
+	err = s.NotifyUser(author.Id, post_id, "comment", user.Name + " commented on your post.")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

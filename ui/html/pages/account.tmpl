@@ -6,8 +6,25 @@
         <p><strong>Username:</strong> {{.User.Name}}</p>
         <p><strong>Email:</strong> {{.User.Email}}</p>
         <p><strong>Role:</strong> {{.User.Role}}</p>
-    </div><br><br>
-
+    </div><br>
+    <div class="notifications">
+    <h3>Notifications</h3>
+    {{if .Notifications}}
+        <ul>
+            {{range .Notifications}}
+                <li class="{{if not .Read}}unread{{end}}">
+                    {{.Message}} <small>{{humanDate .CreatedAt}}</small>
+                    <form action="/notifications/read" method="POST">
+                        <input type="hidden" name="notification_id" value="{{.Id}}">
+                        <button type="submit">Mark as Read</button>
+                    </form>
+                </li>
+            {{end}}
+        </ul>
+    {{else}}
+        <p>No new notifications.</p>
+    {{end}}
+    </div><br>
     {{if eq .User.Role "User"}}
     <div class="user-actions">
         <h3>Actions</h3>
@@ -187,5 +204,6 @@
         </ul>
     </div>
     {{end}}
+    
 </div>
 {{end}}

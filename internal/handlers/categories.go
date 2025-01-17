@@ -59,3 +59,39 @@ func (h *Handler) deleteCategory(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
 }
+
+func (h *Handler) markNotificationRead(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+    err := r.ParseForm()
+    if err != nil {
+        h.ClientError(w, http.StatusBadRequest)
+        return
+    }
+	notifications, err := h.service.GetNotifications()
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+    notificationIdStr := r.PostForm.Get("notification_id")
+    if notificationIdStr == "" {
+        h.ClientError(w, http.StatusBadRequest)
+        return
+    }
+
+	notificationId, err := strconv.Atoi(notificationIdStr)
+	if err != nil || notificationId < 1 || !NotificationExists(notificationId, notifications) {
+		h.NotFound(w)
+		return
+	}
+    err = h.service.MarkNotificationAsRead(notificationId)
+    if err != nil {
+        h.ServerError(w, err)
+        return
+    }
+
+    http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
+}

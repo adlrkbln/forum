@@ -42,6 +42,18 @@ func (h *Handler) RecoverPanic(next http.Handler) http.Handler {
 	})
 }
 
+func (h *Handler) CheckGuest(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sessionCookie := cookies.GetSessionCookie("session_id", r)
+		if sessionCookie != nil {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		w.Header().Add("Cache-Control", "no-store")
+		next.ServeHTTP(w, r)
+	})
+}
+
 func (h *Handler) RequireAuthentication(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sessionCookie := cookies.GetSessionCookie("session_id", r)

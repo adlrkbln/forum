@@ -98,6 +98,17 @@ func OpenDB(dsn string) (*Sqlite, error) {
 			FOREIGN KEY (post_id) REFERENCES posts(id),
 			FOREIGN KEY (category_id) REFERENCES category(id)
 		);`,
+		`CREATE TABLE IF NOT EXISTS notifications (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			post_id INTEGER,
+			type TEXT NOT NULL,
+			message TEXT NOT NULL,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			read BOOLEAN DEFAULT 0,
+			FOREIGN KEY (user_id) REFERENCES users (id),
+			FOREIGN KEY (post_id) REFERENCES posts (id)
+		);`,
 	}
 	for _, query := range queries {
 		stmt, err := db.Prepare(query)

@@ -169,3 +169,12 @@ func UserExists(userId int, users []*models.User) bool {
 	}
 	return false
 }
+
+func NotificationExists(notificationId int, notifications []*models.Notification) bool {
+	for _, notification := range notifications {
+		if notification.Id == notificationId {
+			return true
+		}
+	}
+	return false
+}
