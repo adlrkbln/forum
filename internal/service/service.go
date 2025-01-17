@@ -30,6 +30,7 @@ type Post interface {
 	InsertComment(post_id int, user_id int, content string) error
 	GetCreatedPosts(user_id int) ([]*models.Post, error)
 	GetLikedPosts(user_id int) ([]*models.Post, error)
+	GetDislikedPosts(user_id int) ([]*models.Post, error)
 	AddDislikePost(post_id int, user_id int) error
 	AddLikePost(post_id int, user_id int) error
 	AddLikeComment(comment_id, user_id int) error
@@ -39,6 +40,7 @@ type Post interface {
 	DeleteCategory(id int) error
 	CreateCategory(form models.CategoryCreateForm) error 
 	DeleteComment(commentID int) error 
+	GetCommentedPosts(userId int) ([]*models.CommentWithPost, error)
 	
 }
 

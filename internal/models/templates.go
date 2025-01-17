@@ -14,6 +14,10 @@ type TemplateData struct {
 	ModeratorRequests []*ModeratorRequest
 	Notification      *Notification
 	Notifications     []*Notification
+	LikedPosts        []*Post
+	DislikedPosts     []*Post
+	CreatedPosts      []*Post
+	CommentedPosts    []*CommentWithPost
 	Form              any
 	IsAuthenticated   bool
 	IsModerator       bool

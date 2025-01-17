@@ -50,7 +50,7 @@
         {{else}}
             <p>You haven't requested moderator access yet.</p>
         {{end}}
-    </div>
+    </div><br><br>
     {{end}}
 
     {{if eq .User.Role "Moderator"}}
@@ -74,7 +74,7 @@
         {{else}}
             <p>You haven't submitted any reports yet.</p>
         {{end}}
-    </div>
+    </div><br><br>
     
     {{end}}
     {{if eq .User.Role "Admin"}}
@@ -202,8 +202,97 @@
             </li>
             {{end}}
         </ul>
-    </div>
+    </div><br><br>
     {{end}}
-    
+    <div class="user-activity">
+        <h2>Your Activity</h2>
+
+        <h3>Liked Posts</h3>
+        {{if .LikedPosts}}
+        <div class="post-list-container">
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Created</th>
+                </tr>
+                {{range .LikedPosts}}
+                <tr>
+                    <td><a href='/post/view?id={{.Id}}'>{{.Title}}</a></td>
+                    <!-- Use the new template function here -->
+                    <td>{{humanDate .Created}}</td>
+                </tr>
+                {{end}}
+            </table>
+            {{else}}
+                <p>You haven't liked any posts yet!</p>
+            {{end}}
+        </div><br>
+
+        <h3>Disliked Posts</h3>
+        {{if .DislikedPosts}}
+        <div class="post-list-container">
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Created</th>
+                </tr>
+                {{range .DislikedPosts}}
+                <tr>
+                    <td><a href='/post/view?id={{.Id}}'>{{.Title}}</a></td>
+                    <!-- Use the new template function here -->
+                    <td>{{humanDate .Created}}</td>
+                </tr>
+                {{end}}
+            </table>
+            {{else}}
+                <p>You haven't disliked any posts yet!</p>
+            {{end}}
+        </div><br>
+
+        <h3>Created Posts</h3>
+        {{if .CreatedPosts}}
+        <div class="post-list-container">
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Created</th>
+                </tr>
+                {{range .CreatedPosts}}
+                <tr>
+                    <td><a href='/post/view?id={{.Id}}'>{{.Title}}</a></td>
+                    <!-- Use the new template function here -->
+                    <td>{{humanDate .Created}}</td>
+                </tr>
+                {{end}}
+            </table>
+            {{else}}
+                <p>You haven't created any posts yet!</p>
+            {{end}}
+        </div><br>
+
+        <h3>Posts you have commented on</h3>
+        {{if .CommentedPosts}}
+        <div class="post-list-container">
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Created</th>
+                    <th>Your comment</th>
+                </tr>
+                {{range .CommentedPosts}}
+                <tr>
+                    <td><a href='/post/view?id={{.Post.Id}}'>{{.Post.Title}}</a></td>
+                    <!-- Use the new template function here -->
+                    <td>{{humanDate .Post.Created}}</td>
+                    <td>"{{.Comment.Content}}"</td>
+                </tr>
+                {{end}}
+            </table>
+            <br>
+            {{else}}
+                <p>You haven't commented on any posts yet!</p>
+            {{end}}
+        </div>
+    </div>
 </div>
 {{end}}

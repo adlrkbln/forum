@@ -204,6 +204,99 @@ func (sq *Sqlite) GetLikedPosts(user_id int) ([]*models.Post, error) {
 	return posts, nil
 }
 
+func (sq *Sqlite) GetDislikedPosts(user_id int) ([]*models.Post, error) {
+	stmt := `SELECT p.id, p.user_id, p.title, p.content, p.likes, p.dislikes, p.created FROM posts p
+	JOIN user_post_reactions upr ON p.id = upr.post_id
+	WHERE upr.user_id = ? AND upr.reaction = -1
+    ORDER BY p.id DESC`
+
+	rows, err := sq.DB.Query(stmt, user_id)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	posts := []*models.Post{}
+
+	for rows.Next() {
+		s := &models.Post{}
+		err = rows.Scan(&s.Id, &s.UserId, &s.Title, &s.Content, &s.Likes, &s.Dislikes, &s.Created)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+func (sq *Sqlite) GetCommentedPostsByUser(userId int) ([]*models.CommentWithPost, error) {
+	stmt := `
+    SELECT 
+        c.id, c.content, c.created_at, 
+        p.id AS post_id, p.title AS post_title, p.created AS post_created
+    FROM comments c
+    INNER JOIN posts p ON c.post_id = p.id
+    WHERE c.user_id = ?
+    ORDER BY c.created_at DESC
+    `
+	rows, err := sq.DB.Query(stmt, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	commentsWithPosts := []*models.CommentWithPost{}
+	for rows.Next() {
+		commentWithPost := &models.CommentWithPost{}
+		err := rows.Scan(
+			&commentWithPost.Comment.Id,
+			&commentWithPost.Comment.Content,
+			&commentWithPost.Comment.Created,
+			&commentWithPost.Post.Id,
+			&commentWithPost.Post.Title,
+			&commentWithPost.Post.Created,
+		)
+		if err != nil {
+			return nil, err
+		}
+		commentsWithPosts = append(commentsWithPosts, commentWithPost)
+	}
+	return commentsWithPosts, nil
+}
+
+// func (sq *Sqlite) GetCommentedPostsByUser(userId int) ([]*models.Post, error) {
+//     stmt := `
+//     SELECT DISTINCT p.id, p.title, p.content, p.created, u.name
+//     FROM posts p
+//     INNER JOIN comments c ON p.id = c.post_id
+// 	JOIN users u ON p.user_id = u.id
+//     WHERE c.user_id = ?
+//     ORDER BY p.created DESC
+//     `
+//     rows, err := sq.DB.Query(stmt, userId)
+//     if err != nil {
+//         return nil, err
+//     }
+//     defer rows.Close()
+
+//     posts := []*models.Post{}
+//     for rows.Next() {
+//         post := &models.Post{}
+//         err := rows.Scan(&post.Id, &post.Title, &post.Content, &post.Created, &post.Username)
+//         if err != nil {
+//             return nil, err
+//         }
+//         posts = append(posts, post)
+//     }
+//     return posts, nil
+// }
+
 func (sq *Sqlite) FindReportsForPost(post_id int) ([]*models.Report, error) {
 	stmt := `SELECT id, post_id, moderator_id, reason, status, created_at FROM reports WHERE post_id = ? AND status = 'Pending';`
 

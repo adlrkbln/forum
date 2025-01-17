@@ -181,39 +181,6 @@ func (h *Handler) commentPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", post_id), http.StatusSeeOther)
 }
 
-func (h *Handler) likedPosts(w http.ResponseWriter, r *http.Request) {
-	createdPosts := r.URL.Query().Get("createdPosts")
-
-	var err error
-
-	var posts []*models.Post
-
-	user, err := h.service.GetUser(r)
-	if err != nil {
-		h.ServerError(w, err)
-		return
-	}
-
-	if createdPosts == "true" {
-		posts, err = h.service.GetCreatedPosts(user.Id)
-	} else {
-		posts, err = h.service.GetLikedPosts(user.Id)
-	}
-	if err != nil {
-		h.ServerError(w, err)
-		return
-	}
-
-	data, err := h.NewTemplateData(w, r)
-	if err != nil {
-		h.ServerError(w, err)
-		return
-	}
-	data.Posts = posts
-
-	h.Render(w, http.StatusOK, "liked.tmpl", data)
-}
-
 func (h *Handler) reportPost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

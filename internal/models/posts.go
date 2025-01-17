@@ -51,3 +51,8 @@ type CommentCreateForm struct {
 	Content            string
 	validate.Validator `form:"-"`
 }
+
+type CommentWithPost struct {
+    Post Post
+	Comment Comment
+}

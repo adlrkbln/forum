@@ -77,6 +77,32 @@ func (h *Handler) accountPageGet(w http.ResponseWriter, r *http.Request) {
 
 	data.Notifications = notifications
 
+	liked_posts, err := h.service.GetLikedPosts(user.Id)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	disliked_posts, err := h.service.GetDislikedPosts(user.Id)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	created_posts, err := h.service.GetCreatedPosts(user.Id)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	commentedPosts, err := h.service.GetCommentedPosts(user.Id)
+    if err != nil {
+        h.ServerError(w, err)
+        return
+    }
+	
+	data.LikedPosts = liked_posts
+	data.DislikedPosts = disliked_posts
+	data.CreatedPosts = created_posts
+	data.CommentedPosts = commentedPosts
+	
 	h.Render(w, http.StatusOK, "account.tmpl", data)
 }
 

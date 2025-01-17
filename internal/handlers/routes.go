@@ -10,7 +10,6 @@ func (h *Handler) Routes() http.Handler {
 
 	mux.HandleFunc("/", h.home)
 	mux.HandleFunc("/post/view", h.postView)
-	mux.HandleFunc("/liked", h.RequireAuthentication(h.likedPosts))
 	mux.HandleFunc("/post/create", h.RequireAuthentication(h.postCreate))
 	mux.HandleFunc("/post/comment", h.RequireAuthentication(h.commentPost))
 	mux.HandleFunc("/post/like", h.RequireAuthentication(h.likePost))

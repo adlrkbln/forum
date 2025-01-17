@@ -21,11 +21,13 @@ type PostModel interface {
 	InsertComment(post_id int, user_id int, content string) error
 	GetCreatedPosts(user_id int) ([]*models.Post, error)
 	GetLikedPosts(user_id int) ([]*models.Post, error)
+	GetDislikedPosts(user_id int) ([]*models.Post, error)
 	DeletePost(post_id int) error
 	FindReportsForPost(post_id int) ([]*models.Report, error)
 	ChangeReportStatus(report_id int) error
 	DeleteComment(commentID int) error
 	GetPostAuthor(post_id int) (*models.User, error)
+	GetCommentedPostsByUser(userId int) ([]*models.CommentWithPost, error)
 }
 
 type UserModel interface {

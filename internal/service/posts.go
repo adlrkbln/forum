@@ -89,6 +89,15 @@ func (s *service) GetLikedPosts(user_id int) ([]*models.Post, error) {
 	return posts, nil
 }
 
+func (s *service) GetDislikedPosts(user_id int) ([]*models.Post, error) {
+	posts, err := s.repo.GetDislikedPosts(user_id)
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
 func (s *service) DeletePost(post_id int) error {
 	err := s.repo.DeletePost(post_id)
 	if err != nil {
@@ -116,4 +125,8 @@ func (s *service) IgnoreReport(report_id int) error {
 
 func (s *service) DeleteComment(commentID int) error {
 	return s.repo.DeleteComment(commentID)
+}
+
+func (s *service) GetCommentedPosts(userId int) ([]*models.CommentWithPost, error) {
+    return s.repo.GetCommentedPostsByUser(userId)
 }

@@ -9,11 +9,6 @@
         <button type="submit" name="category" value="{{.Id}}">{{.Name}}</button>
     </form>
     {{end}}
-    {{if .IsAuthenticated}}
-        <form method="GET" action="/liked">
-            <button type="submit">Liked Posts</button>
-        </form>
-    {{end}} 
     <br><br><a href='/'>Clear</a>
     </div>
     
