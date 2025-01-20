@@ -8,6 +8,10 @@ import (
 )
 
 func (h *Handler) home(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
 	if r.URL.Path != "/" {
 		h.NotFound(w)
 		return

@@ -23,7 +23,7 @@
         </form>
         {{end}}
         {{if .IsAdmin}}
-            <form action="/admin/delete-post" method="POST">
+            <form action="/post/delete" method="POST">
                 <input type="hidden" name="PostId" value="{{.Post.Id}}">
                 <button type='submit' class="delete-button">🗑 Delete Post</button>
             </form>
@@ -79,7 +79,7 @@
                             <button type='submit' class="dislike-button">👎 ({{.Dislikes}})</button>
                         </form>
                         {{if $.IsAdmin}}
-                            <form action="/admin/delete-comment" method="POST">
+                            <form action="/comment/delete" method="POST">
                                 <input type="hidden" name="CommentId" value="{{.Id}}">
                                 <button type='submit' class="delete-button">🗑 Delete Comment</button>
                             </form>

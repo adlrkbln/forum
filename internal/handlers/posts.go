@@ -60,6 +60,10 @@ func (h *Handler) postCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) postCreatePost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
 	err := r.ParseForm()
 	if err != nil {
 		h.ClientError(w, http.StatusBadRequest)
@@ -135,55 +139,9 @@ func (h *Handler) postCreatePost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", id), http.StatusSeeOther)
 }
 
-func (h *Handler) commentPost(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		h.ClientError(w, http.StatusMethodNotAllowed)
-		return
-	}
-
-	posts, err := h.service.GetAllPosts()
-	if err != nil {
-		h.ServerError(w, err)
-		return
-	}
-
-	post_idStr := r.FormValue("PostId")
-	post_id, err := strconv.Atoi(post_idStr)
-	if err != nil || post_id < 1 || !PostExists(post_id, posts) {
-		h.NotFound(w)
-		return
-	}
-
-	user, err := h.service.GetUser(r)
-	if err != nil {
-		h.ServerError(w, err)
-	}
-
-	content := r.FormValue("content")
-
-	form := models.CommentCreateForm{
-		Content: r.PostForm.Get("content"),
-	}
-
-	form.CheckField(validate.NotBlank(form.Content), "content", "This field cannot be blank")
-
-	if !form.Valid() {
-		http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", post_id), http.StatusSeeOther)
-		return
-	}
-
-	err = h.service.InsertComment(post_id, user.Id, content)
-	if err != nil {
-		http.Error(w, "Failed to add comment", http.StatusInternalServerError)
-		return
-	}
-
-	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", post_id), http.StatusSeeOther)
-}
-
 func (h *Handler) reportPost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		h.ClientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 	posts, err := h.service.GetAllPosts()
@@ -207,7 +165,7 @@ func (h *Handler) reportPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if user.Role != "Moderator" {
-		http.Error(w, "Forbidden: Moderator access required", http.StatusForbidden)
+		h.ClientError(w, http.StatusForbidden)
 		return
 	}
 
@@ -222,7 +180,7 @@ func (h *Handler) reportPost(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		h.ClientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -245,8 +203,13 @@ func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.Role != "Admin" {
-		http.Error(w, "Forbidden: Admin access required", http.StatusForbidden)
+	author, err := h.service.GetPostAuthor(post_id)
+	if err != nil {
+		h.ServerError(w, err)
+	}
+
+	if user.Role != "Admin" || user.Id == author {
+		h.ClientError(w, http.StatusForbidden)
 		return
 	}
 	err = h.service.DeletePost(post_id)
@@ -260,7 +223,7 @@ func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) ignoreReport(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		h.ClientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 	report_idStr := r.FormValue("report_id")
@@ -276,7 +239,7 @@ func (h *Handler) ignoreReport(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if user.Role != "Admin" {
-		http.Error(w, "Forbidden: Admin access required", http.StatusForbidden)
+		h.ClientError(w, http.StatusForbidden)
 		return
 	}
 	err = h.service.IgnoreReport(report_id)
@@ -286,4 +249,76 @@ func (h *Handler) ignoreReport(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
+}
+
+func (h *Handler) postEdit(w http.ResponseWriter, r *http.Request) {
+    switch r.Method {
+	case http.MethodGet:
+		id, err := strconv.Atoi(r.URL.Query().Get("id"))
+		if err != nil || id < 1 {
+			h.NotFound(w)
+			return
+		}
+		data, err := h.NewTemplateData(w, r)
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		post, err := h.service.GetPost(id)
+		if err != nil {
+			h.ServerError(w, err)
+		}
+		data.Post = post
+		data.Form = models.PostCreateForm{}
+		h.Render(w, http.StatusOK, "edit_post.tmpl", data)
+	case http.MethodPost:
+		h.postEditPost(w, r)
+	default:
+		h.ClientError(w, http.StatusMethodNotAllowed)
+	}
+}
+
+func (h *Handler) postEditPost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+	err := r.ParseForm()
+	if err != nil {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := models.PostCreateForm{
+		Title:       r.PostForm.Get("title"),
+		Content:     r.PostForm.Get("content"),
+	}
+
+	form.CheckField(validate.NotBlank(form.Title), "title", "This field cannot be blank")
+	form.CheckField(validate.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 characters long")
+	form.CheckField(validate.NotBlank(form.Content), "content", "This field cannot be blank")
+
+	if !form.Valid() {
+		data, err := h.NewTemplateData(w, r)
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		data.Form = form
+		h.Render(w, http.StatusUnprocessableEntity, "edit_post.tmpl", data)
+		return
+	}
+	data, err := h.NewTemplateData(w, r)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	
+	err = h.service.UpdatePost(form, data)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", data.Post.Id), http.StatusSeeOther)
 }

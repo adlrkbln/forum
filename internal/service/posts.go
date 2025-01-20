@@ -130,3 +130,11 @@ func (s *service) DeleteComment(commentID int) error {
 func (s *service) GetCommentedPosts(userId int) ([]*models.CommentWithPost, error) {
     return s.repo.GetCommentedPostsByUser(userId)
 }
+
+func (s *service) UpdatePost(form models.PostCreateForm, data *models.TemplateData) error {
+	err := s.repo.UpdatePost(data.Post.Id, form.Title, form.Content)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -79,7 +79,7 @@ func (h *Handler) RequireModerator(next http.HandlerFunc) http.HandlerFunc {
 
 		user, err := h.service.GetUser(r)
 		if err != nil || user.Role != "Moderator" {
-			http.Error(w, "Forbidden: Moderator access required", http.StatusForbidden)
+			h.ClientError(w, http.StatusForbidden)
 			return
 		}
 
@@ -97,7 +97,7 @@ func (h *Handler) RequireAdmin(next http.HandlerFunc) http.HandlerFunc {
 
 		user, err := h.service.GetUser(r)
 		if err != nil || user.Role != "Admin" {
-			http.Error(w, "Forbidden: Admin access required", http.StatusForbidden)
+			h.ClientError(w, http.StatusForbidden)
 			return
 		}
 
@@ -175,7 +175,7 @@ func (h *Handler) RateLimiter(next http.Handler) http.Handler {
 		mu.Unlock()
 
 		if !c.limiter.allow() {
-			http.Error(w, "Too Many Requests", http.StatusTooManyRequests)
+			h.ClientError(w, http.StatusTooManyRequests)
 			return
 		}
 

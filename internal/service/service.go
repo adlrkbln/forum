@@ -41,6 +41,7 @@ type Post interface {
 	CreateCategory(form models.CategoryCreateForm) error 
 	DeleteComment(commentID int) error 
 	GetCommentedPosts(userId int) ([]*models.CommentWithPost, error)
+	UpdatePost(form models.PostCreateForm, data *models.TemplateData) error
 	
 }
 
@@ -64,4 +65,5 @@ type User interface {
 	GetUnreadNotifications(userId int) ([]*models.Notification, error)
 	MarkNotificationAsRead(notificationId int) error
 	GetNotifications() ([]*models.Notification, error)
+	GetPostAuthor(post_id int) (int, error) 
 }

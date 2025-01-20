@@ -131,3 +131,11 @@ func (s *service) GetModeratorReports(user_id int) ([]*models.Report, error) {
 func (s *service) DemoteModerator(userID int) error {
 	return s.repo.DemoteModerator(userID)
 }
+
+func (s *service) GetPostAuthor(post_id int) (int, error) {
+	author, err := s.repo.GetPostAuthor(post_id)
+	if err != nil {
+		return 0, err
+	}
+	return author.Id, nil
+}

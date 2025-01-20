@@ -7,6 +7,11 @@ import (
 )
 
 func (h *Handler) accountPageGet(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
 	user, err := h.service.GetUser(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -93,20 +98,24 @@ func (h *Handler) accountPageGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	commentedPosts, err := h.service.GetCommentedPosts(user.Id)
-    if err != nil {
-        h.ServerError(w, err)
-        return
-    }
-	
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
 	data.LikedPosts = liked_posts
 	data.DislikedPosts = disliked_posts
 	data.CreatedPosts = created_posts
 	data.CommentedPosts = commentedPosts
-	
+
 	h.Render(w, http.StatusOK, "account.tmpl", data)
 }
 
 func (h *Handler) userRequestModerator(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
 	user, err := h.service.GetUser(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -133,6 +142,10 @@ func (h *Handler) userRequestModerator(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) promoteUserToModerator(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
 	id, err := strconv.Atoi(r.PostFormValue("id"))
 	if err != nil {
 		h.ClientError(w, http.StatusBadRequest)
@@ -149,6 +162,10 @@ func (h *Handler) promoteUserToModerator(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *Handler) denyModeratorRequest(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
 	id, err := strconv.Atoi(r.PostFormValue("id"))
 	if err != nil {
 		h.ClientError(w, http.StatusBadRequest)

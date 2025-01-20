@@ -9,8 +9,10 @@ import (
 
 func (h *Handler) addCategories(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
 	}
+
 	var form models.CategoryCreateForm
 	err := r.ParseForm()
 	if err != nil {
@@ -31,7 +33,7 @@ func (h *Handler) addCategories(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) deleteCategory(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		h.ClientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -54,7 +56,7 @@ func (h *Handler) deleteCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := h.service.DeleteCategory(categoryID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.ClientError(w, http.StatusInternalServerError)
 		return
 	}
 	http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
@@ -62,9 +64,10 @@ func (h *Handler) deleteCategory(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) markNotificationRead(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		h.ClientError(w, http.StatusMethodNotAllowed)
 		return
 	}
+
     err := r.ParseForm()
     if err != nil {
         h.ClientError(w, http.StatusBadRequest)

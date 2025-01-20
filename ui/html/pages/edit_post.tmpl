@@ -1,0 +1,18 @@
+{{define "title"}}Edit Post{{end}}
+
+{{define "main"}}
+<form action='/post/edit' method='POST'>
+    <input type="hidden" name="post_id" value="{{.Post.Id}}">
+    <div>
+        <label>Title:</label>
+        <input type='text' name='title' value='{{.Post.Title}}' required>
+    </div>
+    <div>
+        <label>Content:</label>
+        <textarea name='content' required>{{.Post.Content}}</textarea>
+    </div>
+    <div>
+        <input type='submit' value='Update Post'>
+    </div>
+</form>
+{{end}}

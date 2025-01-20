@@ -270,33 +270,6 @@ func (sq *Sqlite) GetCommentedPostsByUser(userId int) ([]*models.CommentWithPost
 	return commentsWithPosts, nil
 }
 
-// func (sq *Sqlite) GetCommentedPostsByUser(userId int) ([]*models.Post, error) {
-//     stmt := `
-//     SELECT DISTINCT p.id, p.title, p.content, p.created, u.name
-//     FROM posts p
-//     INNER JOIN comments c ON p.id = c.post_id
-// 	JOIN users u ON p.user_id = u.id
-//     WHERE c.user_id = ?
-//     ORDER BY p.created DESC
-//     `
-//     rows, err := sq.DB.Query(stmt, userId)
-//     if err != nil {
-//         return nil, err
-//     }
-//     defer rows.Close()
-
-//     posts := []*models.Post{}
-//     for rows.Next() {
-//         post := &models.Post{}
-//         err := rows.Scan(&post.Id, &post.Title, &post.Content, &post.Created, &post.Username)
-//         if err != nil {
-//             return nil, err
-//         }
-//         posts = append(posts, post)
-//     }
-//     return posts, nil
-// }
-
 func (sq *Sqlite) FindReportsForPost(post_id int) ([]*models.Report, error) {
 	stmt := `SELECT id, post_id, moderator_id, reason, status, created_at FROM reports WHERE post_id = ? AND status = 'Pending';`
 
@@ -370,4 +343,11 @@ func (sq *Sqlite) GetPostAuthor(post_id int) (*models.User, error) {
 		}
 	}
 	return s, err
+}
+
+
+func (sq *Sqlite) UpdatePost(post_id int, title, content string) error {
+    query := `UPDATE posts SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
+    _, err := sq.DB.Exec(query, title, content, post_id)
+    return err
 }

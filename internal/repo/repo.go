@@ -28,6 +28,7 @@ type PostModel interface {
 	DeleteComment(commentID int) error
 	GetPostAuthor(post_id int) (*models.User, error)
 	GetCommentedPostsByUser(userId int) ([]*models.CommentWithPost, error)
+	UpdatePost(post_id int, title, content string) error
 }
 
 type UserModel interface {

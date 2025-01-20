@@ -6,7 +6,6 @@ import (
 	"forum/internal/models"
 	"forum/internal/validate"
 	"net/http"
-	"strconv"
 )
 
 func (h *Handler) userSignup(w http.ResponseWriter, r *http.Request) {
@@ -27,6 +26,10 @@ func (h *Handler) userSignup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) userSignupPost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
 	var form models.UserSignupForm
 
 	err := r.ParseForm()
@@ -96,6 +99,10 @@ func (h *Handler) userLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
 	var form models.UserLoginForm
 
 	err := r.ParseForm()
@@ -141,6 +148,10 @@ func (h *Handler) userLoginPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
 	c := cookies.GetSessionCookie("session_id", r)
 	if c != nil {
 		h.service.DeleteSession(c.Value)
@@ -148,41 +159,4 @@ func (h *Handler) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func (h *Handler) deleteComment(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	comments, err := h.service.GetAllComments()
-	if err != nil {
-		h.ServerError(w, err)
-		return
-	}
-
-	commentID, err := strconv.Atoi(r.FormValue("CommentId"))
-	if err != nil || commentID <= 0 || !CommentExists(commentID, comments) {
-		h.ClientError(w, http.StatusBadRequest)
-		return
-	}
-
-	user, err := h.service.GetUser(r)
-	if err != nil {
-		h.ServerError(w, err)
-		return
-	}
-
-	if user.Role != "Admin" {
-		http.Error(w, "Forbidden: Admin access required", http.StatusForbidden)
-		return
-	}
-
-	if err := h.service.DeleteComment(commentID); err != nil {
-		h.ServerError(w, err)
-		return
-	}
-
-	http.Redirect(w, r, r.Referer(), http.StatusSeeOther)
 }

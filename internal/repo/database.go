@@ -28,7 +28,8 @@ func OpenDB(dsn string) (*Sqlite, error) {
 			content TEXT NOT NULL,
 			likes INTEGER DEFAULT 0,
 			dislikes INTEGER DEFAULT 0,
-			created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+			created TIMESTAMP,
+			updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);`,
 		`CREATE TABLE IF NOT EXISTS sessions (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,7 +67,8 @@ func OpenDB(dsn string) (*Sqlite, error) {
 			content TEXT NOT NULL,
 			likes INTEGER DEFAULT 0,
 			dislikes INTEGER DEFAULT 0,
-			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			created_at DATETIME,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (post_id) REFERENCES posts(id),
 			FOREIGN KEY (user_id) REFERENCES users(id)
 		);`,

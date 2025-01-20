@@ -10,7 +10,7 @@
     <div>
         <!-- Toggle the links based on authentication status -->
         {{if .IsAuthenticated}}
-            <form action='/user/profile' method='POST'>
+            <form action='/user/profile' method='GET'>
                 <button>Profile</button>
             </form>
             <form action='/user/logout' method='POST'>
