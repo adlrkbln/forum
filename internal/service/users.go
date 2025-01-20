@@ -139,3 +139,11 @@ func (s *service) GetPostAuthor(post_id int) (int, error) {
 	}
 	return author.Id, nil
 }
+
+func (s *service) GetCommentAuthor(comment_id int) (int, error) {
+	author, err := s.repo.GetCommentAuthor(comment_id)
+	if err != nil {
+		return 0, err
+	}
+	return author.Id, nil
+}

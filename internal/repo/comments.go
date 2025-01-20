@@ -1,12 +1,10 @@
 package repo
 
-import "forum/internal/models"
-
-func (sq *Sqlite) UpdateComment(post_id int, title, content string) error {
-	query := `UPDATE comments SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
-	_, err := sq.DB.Exec(query, title, content, post_id)
-	return err
-}
+import (
+	"database/sql"
+	"errors"
+	"forum/internal/models"
+)
 
 func (sq *Sqlite) DeleteComment(commentID int) error {
 	stmt := `DELETE FROM comments WHERE id = ?`
@@ -121,4 +119,47 @@ func (sq *Sqlite) GetCommentsForPost(post_id int) ([]models.Comment, error) {
 	}
 
 	return comments, nil
+}
+
+func (sq *Sqlite) UpdateComment(comment_id int, content string) error {
+	query := `UPDATE comments SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
+	_, err := sq.DB.Exec(query, content, comment_id)
+	return err
+}
+
+func (sq *Sqlite) GetComment(id int) (*models.Comment, error) {
+	stmt := `SELECT id, user_id, post_id, content, likes, dislikes, created_at FROM comments c
+	WHERE id = ?`
+
+	row := sq.DB.QueryRow(stmt, id)
+
+	s := &models.Comment{}
+	err := row.Scan(&s.Id, &s.UserId, &s.PostId, &s.Content, &s.Likes, &s.Dislikes, &s.Created)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, models.ErrNoRecord
+		} else {
+			return nil, err
+		}
+	}
+
+	return s, nil
+}
+
+func (sq *Sqlite) GetCommentAuthor(comment_id int) (*models.User, error) {
+	stmt := `SELECT u.id from users u
+	JOIN comments c ON u.id = c.user_id 
+	WHERE c.id = ?`
+	row := sq.DB.QueryRow(stmt, comment_id)
+
+	s := &models.User{}
+	err := row.Scan(&s.Id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, models.ErrNoRecord
+		} else {
+			return nil, err
+		}
+	}
+	return s, err
 }

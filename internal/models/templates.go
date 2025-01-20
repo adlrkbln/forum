@@ -4,6 +4,7 @@ type TemplateData struct {
 	CurrentYear       int
 	Post              *Post
 	Posts             []*Post
+	Comment           *Comment
 	Category          *Category
 	Categories        []*Category
 	User              *User

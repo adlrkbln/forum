@@ -5,6 +5,7 @@ import "forum/internal/models"
 type Repo interface {
 	PostModel
 	UserModel
+	CommentModel
 	Session
 	Category
 	Reaction
@@ -16,18 +17,13 @@ type PostModel interface {
 	GetPost(id int) (*models.Post, error)
 	GetAllPosts() ([]*models.Post, error)
 	GetPostByCategory(id int) ([]*models.Post, error)
-	GetCommentsForPost(post_id int) ([]models.Comment, error)
-	GetAllComments() ([]*models.Comment, error)
-	InsertComment(post_id int, user_id int, content string) error
 	GetCreatedPosts(user_id int) ([]*models.Post, error)
 	GetLikedPosts(user_id int) ([]*models.Post, error)
 	GetDislikedPosts(user_id int) ([]*models.Post, error)
 	DeletePost(post_id int) error
 	FindReportsForPost(post_id int) ([]*models.Report, error)
 	ChangeReportStatus(report_id int) error
-	DeleteComment(commentID int) error
 	GetPostAuthor(post_id int) (*models.User, error)
-	GetCommentedPostsByUser(userId int) ([]*models.CommentWithPost, error)
 	UpdatePost(post_id int, title, content string) error
 }
 
@@ -46,6 +42,17 @@ type UserModel interface {
 	GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error)
 	GetModeratorReports(user_id int) ([]*models.Report, error)
 	DemoteModerator(userID int) error
+}
+
+type CommentModel interface {
+	InsertComment(post_id int, user_id int, content string) error
+	GetComment(id int) (*models.Comment, error)
+	GetCommentedPostsByUser(userId int) ([]*models.CommentWithPost, error)
+	GetCommentsForPost(post_id int) ([]models.Comment, error)
+	GetAllComments() ([]*models.Comment, error)
+	DeleteComment(commentID int) error
+	UpdateComment(comment_id int, content string) error
+	GetCommentAuthor(comment_id int) (*models.User, error) 
 }
 
 type Session interface {
@@ -80,6 +87,5 @@ type Notification interface {
 	CreateNotification(notification *models.Notification) error
 	GetUnreadNotifications(userId int) ([]*models.Notification, error)
 	MarkNotificationAsRead(notificationId int) error
-	GetNotifications() ([]*models.Notification, error) 
-	
+	GetNotifications() ([]*models.Notification, error)
 }

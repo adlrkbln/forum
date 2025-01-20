@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"forum/internal/models"
 	"forum/internal/validate"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -253,7 +252,7 @@ func (h *Handler) ignoreReport(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) postEdit(w http.ResponseWriter, r *http.Request) {
-    switch r.Method {
+	switch r.Method {
 	case http.MethodGet:
 		id, err := strconv.Atoi(r.URL.Query().Get("id"))
 		if err != nil || id < 1 {
@@ -295,18 +294,15 @@ func (h *Handler) postEditPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("Form Data:", r.PostForm)
-
 	id, err := strconv.Atoi(r.PostForm.Get("post_id"))
-	log.Println(id)
 	if err != nil || id < 1 {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
 
 	form := models.PostCreateForm{
-		Title:       r.PostForm.Get("title"),
-		Content:     r.PostForm.Get("content"),
+		Title:   r.PostForm.Get("title"),
+		Content: r.PostForm.Get("content"),
 	}
 
 	form.CheckField(validate.NotBlank(form.Title), "title", "This field cannot be blank")
@@ -328,7 +324,7 @@ func (h *Handler) postEditPost(w http.ResponseWriter, r *http.Request) {
 		h.ServerError(w, err)
 		return
 	}
-	
+
 	err = h.service.UpdatePost(id, form, data)
 	if err != nil {
 		h.ServerError(w, err)

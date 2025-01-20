@@ -66,8 +66,8 @@ func (h *Handler) deleteComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	commentID, err := strconv.Atoi(r.FormValue("CommentId"))
-	if err != nil || commentID <= 0 || !CommentExists(commentID, comments) {
+	comment_id, err := strconv.Atoi(r.FormValue("CommentId"))
+	if err != nil || comment_id <= 0 || !CommentExists(comment_id, comments) {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
@@ -78,12 +78,17 @@ func (h *Handler) deleteComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.Role != "Admin" {
+	author, err := h.service.GetCommentAuthor(comment_id)
+	if err != nil {
+		h.ServerError(w, err)
+	}
+
+	if user.Role != "Admin" || user.Id != author {
 		h.ClientError(w, http.StatusForbidden)
 		return
 	}
 
-	if err := h.service.DeleteComment(commentID); err != nil {
+	if err := h.service.DeleteComment(comment_id); err != nil {
 		h.ServerError(w, err)
 		return
 	}
@@ -92,9 +97,85 @@ func (h *Handler) deleteComment(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) commentEdit(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		// Fetch comment details and render the edit form
-	} else if r.Method == http.MethodPost {
-		// Update the comment in the database
+    switch r.Method {
+	case http.MethodGet:
+		id, err := strconv.Atoi(r.URL.Query().Get("id"))
+		if err != nil || id < 1 {
+			h.NotFound(w)
+			return
+		}
+		data, err := h.NewTemplateData(w, r)
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		comment, err := h.service.GetComment(id)
+		if err != nil {
+			h.ServerError(w, err)
+		}
+		data.Comment = comment
+		data.Form = models.Comment{
+			Content: comment.Content,
+		}
+		data.Form = models.PostCreateForm{}
+		h.Render(w, http.StatusOK, "edit_comment.tmpl", data)
+	case http.MethodPost:
+		h.commentEditPost(w, r)
+	default:
+		h.ClientError(w, http.StatusMethodNotAllowed)
 	}
+}
+
+func (h *Handler) commentEditPost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		h.ClientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("Form Data:", r.PostForm)
+	id, err := strconv.Atoi(r.PostForm.Get("comment_id"))
+	if err != nil || id < 1 {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := models.CommentCreateForm{
+		Content:     r.PostForm.Get("content"),
+	}
+
+	form.CheckField(validate.NotBlank(form.Content), "content", "This field cannot be blank")
+
+	if !form.Valid() {
+		data, err := h.NewTemplateData(w, r)
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		data.Form = form
+		h.Render(w, http.StatusUnprocessableEntity, "edit_comment.tmpl", data)
+		return
+	}
+	data, err := h.NewTemplateData(w, r)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	
+	err = h.service.UpdateComment(id, form, data)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	comment, err := h.service.GetComment(id)
+	if err != nil {
+		h.ServerError(w, err)
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", comment.PostId), http.StatusSeeOther)
 }

@@ -138,3 +138,19 @@ func (s *service) UpdatePost(id int, form models.PostCreateForm, data *models.Te
 	}
 	return nil
 }
+
+func (s *service) UpdateComment(id int, form models.CommentCreateForm, data *models.TemplateData) error {
+	err := s.repo.UpdateComment(id, form.Content)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *service) GetComment(id int) (*models.Comment, error) {
+	comment, err := s.repo.GetComment(id)
+	if err != nil {
+		return nil, err
+	}
+	return comment, nil
+}

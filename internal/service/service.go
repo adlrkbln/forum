@@ -42,7 +42,8 @@ type Post interface {
 	DeleteComment(commentID int) error 
 	GetCommentedPosts(userId int) ([]*models.CommentWithPost, error)
 	UpdatePost(id int, form models.PostCreateForm, data *models.TemplateData) error
-	
+	UpdateComment(id int, form models.CommentCreateForm, data *models.TemplateData) error
+	GetComment(id int) (*models.Comment, error)
 }
 
 type User interface {
@@ -66,4 +67,5 @@ type User interface {
 	MarkNotificationAsRead(notificationId int) error
 	GetNotifications() ([]*models.Notification, error)
 	GetPostAuthor(post_id int) (int, error) 
+	GetCommentAuthor(comment_id int) (int, error) 
 }
