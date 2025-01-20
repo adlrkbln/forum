@@ -41,7 +41,7 @@ type Post interface {
 	CreateCategory(form models.CategoryCreateForm) error 
 	DeleteComment(commentID int) error 
 	GetCommentedPosts(userId int) ([]*models.CommentWithPost, error)
-	UpdatePost(form models.PostCreateForm, data *models.TemplateData) error
+	UpdatePost(id int, form models.PostCreateForm, data *models.TemplateData) error
 	
 }
 

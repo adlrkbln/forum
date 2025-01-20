@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"forum/internal/models"
 	"forum/internal/validate"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -269,6 +270,10 @@ func (h *Handler) postEdit(w http.ResponseWriter, r *http.Request) {
 			h.ServerError(w, err)
 		}
 		data.Post = post
+		data.Form = models.PostCreateForm{
+			Title:   post.Title,
+			Content: post.Content,
+		}
 		data.Form = models.PostCreateForm{}
 		h.Render(w, http.StatusOK, "edit_post.tmpl", data)
 	case http.MethodPost:
@@ -283,8 +288,18 @@ func (h *Handler) postEditPost(w http.ResponseWriter, r *http.Request) {
 		h.ClientError(w, http.StatusMethodNotAllowed)
 		return
 	}
+
 	err := r.ParseForm()
 	if err != nil {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("Form Data:", r.PostForm)
+
+	id, err := strconv.Atoi(r.PostForm.Get("post_id"))
+	log.Println(id)
+	if err != nil || id < 1 {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
@@ -314,11 +329,11 @@ func (h *Handler) postEditPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	err = h.service.UpdatePost(form, data)
+	err = h.service.UpdatePost(id, form, data)
 	if err != nil {
 		h.ServerError(w, err)
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", data.Post.Id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/post/view?id=%d", id), http.StatusSeeOther)
 }

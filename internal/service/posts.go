@@ -131,8 +131,8 @@ func (s *service) GetCommentedPosts(userId int) ([]*models.CommentWithPost, erro
     return s.repo.GetCommentedPostsByUser(userId)
 }
 
-func (s *service) UpdatePost(form models.PostCreateForm, data *models.TemplateData) error {
-	err := s.repo.UpdatePost(data.Post.Id, form.Title, form.Content)
+func (s *service) UpdatePost(id int, form models.PostCreateForm, data *models.TemplateData) error {
+	err := s.repo.UpdatePost(id, form.Title, form.Content)
 	if err != nil {
 		return err
 	}
