@@ -26,7 +26,7 @@ func OpenDB(dsn string) (*Sqlite, error) {
 			user_id INTEGER,
 			title TEXT NOT NULL,
 			content TEXT NOT NULL,
-			image_path TEXT,
+			image_path TEXT DEFAULT '/static/img/default.png',
 			likes INTEGER DEFAULT 0,
 			dislikes INTEGER DEFAULT 0,
 			created TIMESTAMP,

@@ -7,7 +7,7 @@
             <strong>{{.Title}}</strong>
         </div>
         <pre><code>{{.Content}}</code></pre>
-        {{ if .ImagePath }}
+        {{if ne .ImagePath "/static/img/default.png"}}
             <img src="{{.ImagePath}}" alt="image">
         {{ end }}
         <div class='metadata'>

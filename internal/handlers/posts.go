@@ -112,51 +112,55 @@ func (h *Handler) postCreatePost(w http.ResponseWriter, r *http.Request) {
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
-	defer file.Close()
+	if file != nil {
+		defer file.Close()
 
-	if header != nil {
-		buf := make([]byte, 512)
-		_, err = file.Read(buf)
-		if err != nil {
-			h.ServerError(w, err)
-			return
-		}
-		fileType := http.DetectContentType(buf)
-		fileSize := header.Size
-		filename := header.Filename
-		form.CheckField(validate.MaxFileSize(fileSize, 20<<20), "image", "The image size exceeds 20 MB")
-		form.CheckField(validate.PermittedFileType(fileType, "image/jpeg", "image/png", "image/gif"), "image", "Unsupported image format")
-
-		file.Seek(0, io.SeekStart)
-		if form.Valid() {
-			ext := filepath.Ext(filename)
-			newFilename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
-
-			imageDir := "./ui/static/img/uploads"
-			imageShow := "./static/img/uploads"
-			if _, err := os.Stat(imageDir); os.IsNotExist(err) {
-				err := os.MkdirAll(imageDir, os.ModePerm)
+		if header != nil {
+			buf := make([]byte, 512)
+			_, err = file.Read(buf)
+			if err != nil {
+				h.ServerError(w, err)
+				return
+			}
+			fileType := http.DetectContentType(buf)
+			fileSize := header.Size
+			filename := header.Filename
+			form.CheckField(validate.MaxFileSize(fileSize, 20<<20), "image", "The image size exceeds 20 MB")
+			form.CheckField(validate.PermittedFileType(fileType, "image/jpeg", "image/png", "image/gif"), "image", "Unsupported image format")
+	
+			file.Seek(0, io.SeekStart)
+			if form.Valid() {
+				ext := filepath.Ext(filename)
+				newFilename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
+	
+				imageDir := "./ui/static/img/uploads"
+				imageShow := "/static/img/uploads"
+				if _, err := os.Stat(imageDir); os.IsNotExist(err) {
+					err := os.MkdirAll(imageDir, os.ModePerm)
+					if err != nil {
+						h.ServerError(w, err)
+						return
+					}
+				}
+				imagePath := filepath.Join(imageDir, newFilename)
+	
+				dst, err := os.Create(imagePath)
 				if err != nil {
 					h.ServerError(w, err)
 					return
 				}
+				defer dst.Close()
+	
+				_, err = io.Copy(dst, file)
+				if err != nil {
+					h.ServerError(w, err)
+					return
+				}
+				form.ImagePath = filepath.Join(imageShow, newFilename)
 			}
-			imagePath := filepath.Join(imageDir, newFilename)
-
-			dst, err := os.Create(imagePath)
-			if err != nil {
-				h.ServerError(w, err)
-				return
-			}
-			defer dst.Close()
-
-			_, err = io.Copy(dst, file)
-			if err != nil {
-				h.ServerError(w, err)
-				return
-			}
-			form.ImagePath = filepath.Join(imageShow, newFilename)
 		}
+	} else {
+		form.ImagePath = "/static/img/default.png"
 	}
 	
 	if !form.Valid() {
