@@ -7,6 +7,9 @@
             <strong>{{.Title}}</strong>
         </div>
         <pre><code>{{.Content}}</code></pre>
+        {{ if .ImagePath }}
+            <img src="{{.ImagePath}}" alt="image">
+        {{ end }}
         <div class='metadata'>
             <strong>By {{.Username}}</strong>
             <!-- Use the new template function here -->

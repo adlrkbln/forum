@@ -38,8 +38,8 @@ type Post interface {
 	DeletePost(post_id int) error
 	IgnoreReport(report_id int) error
 	DeleteCategory(id int) error
-	CreateCategory(form models.CategoryCreateForm) error 
-	DeleteComment(commentID int) error 
+	CreateCategory(form models.CategoryCreateForm) error
+	DeleteComment(commentID int) error
 	GetCommentedPosts(userId int) ([]*models.CommentWithPost, error)
 	UpdatePost(id int, form models.PostCreateForm, data *models.TemplateData) error
 	UpdateComment(id int, form models.CommentCreateForm, data *models.TemplateData) error
@@ -58,7 +58,7 @@ type User interface {
 	RequestModeratorRole(user_id int) error
 	GetAllRequests() ([]*models.ModeratorRequest, error)
 	DenyModeratorRequest(request_id int) error
-	PromoteUserToModerator(request_id int) error 
+	PromoteUserToModerator(request_id int) error
 	GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error)
 	GetModeratorReports(user_id int) ([]*models.Report, error)
 	DemoteModerator(userID int) error
@@ -66,6 +66,6 @@ type User interface {
 	GetUnreadNotifications(userId int) ([]*models.Notification, error)
 	MarkNotificationAsRead(notificationId int) error
 	GetNotifications() ([]*models.Notification, error)
-	GetPostAuthor(post_id int) (int, error) 
-	GetCommentAuthor(comment_id int) (int, error) 
+	GetPostAuthor(post_id int) (int, error)
+	GetCommentAuthor(comment_id int) (int, error)
 }

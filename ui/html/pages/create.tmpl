@@ -1,7 +1,7 @@
 {{define "title"}}Create a New Post{{end}}
 
 {{define "main"}}
-<form action='/post/create' method='POST'>
+<form action='/post/create' method='POST' enctype='multipart/form-data'>
     <div>
         <label>Title:</label>
         <!-- Use the `with` action to render the value of .Form.FieldErrors.title
@@ -23,6 +23,12 @@
         <textarea name='content'>{{.Form.Content}}</textarea>
     </div>
     <div>
+        <label>Upload Image:</label>
+        {{with .Form.FieldErrors.image}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <input type="file" name="image" accept="image/jpeg, image/png, image/gif">
+    </div>
         <label>Select Categories:</label><br>
         {{range .Categories}}
             <input type="checkbox" name="categoryIds[]" value="{{.Id}}"> {{.Name}}<br>

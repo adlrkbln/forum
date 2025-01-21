@@ -5,8 +5,13 @@ import (
 	"fmt"
 	"forum/internal/models"
 	"forum/internal/validate"
+	"io"
+	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
+	"time"
 )
 
 func (h *Handler) postView(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +37,6 @@ func (h *Handler) postView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data.Post = post
-
 	h.Render(w, http.StatusOK, "view.tmpl", data)
 }
 
@@ -64,8 +68,9 @@ func (h *Handler) postCreatePost(w http.ResponseWriter, r *http.Request) {
 		h.ClientError(w, http.StatusMethodNotAllowed)
 		return
 	}
-	err := r.ParseForm()
+	err := r.ParseMultipartForm(20 << 20)
 	if err != nil {
+		log.Println(err)
 		h.ClientError(w, http.StatusBadRequest)
 		return
 	}
@@ -102,6 +107,58 @@ func (h *Handler) postCreatePost(w http.ResponseWriter, r *http.Request) {
 	form.CheckField(validate.NotBlank(form.Content), "content", "This field cannot be blank")
 	form.CheckField(validate.CheckCategory(form.CategoryIds), "categoryIds[]", "Choose existing categories")
 
+	file, header, err := r.FormFile("image")
+	if err != nil && err != http.ErrMissingFile {
+		h.ClientError(w, http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	if header != nil {
+		buf := make([]byte, 512)
+		_, err = file.Read(buf)
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		fileType := http.DetectContentType(buf)
+		fileSize := header.Size
+		filename := header.Filename
+		form.CheckField(validate.MaxFileSize(fileSize, 20<<20), "image", "The image size exceeds 20 MB")
+		form.CheckField(validate.PermittedFileType(fileType, "image/jpeg", "image/png", "image/gif"), "image", "Unsupported image format")
+
+		file.Seek(0, io.SeekStart)
+		if form.Valid() {
+			ext := filepath.Ext(filename)
+			newFilename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
+
+			imageDir := "./ui/static/img/uploads"
+			imageShow := "./static/img/uploads"
+			if _, err := os.Stat(imageDir); os.IsNotExist(err) {
+				err := os.MkdirAll(imageDir, os.ModePerm)
+				if err != nil {
+					h.ServerError(w, err)
+					return
+				}
+			}
+			imagePath := filepath.Join(imageDir, newFilename)
+
+			dst, err := os.Create(imagePath)
+			if err != nil {
+				h.ServerError(w, err)
+				return
+			}
+			defer dst.Close()
+
+			_, err = io.Copy(dst, file)
+			if err != nil {
+				h.ServerError(w, err)
+				return
+			}
+			form.ImagePath = filepath.Join(imageShow, newFilename)
+		}
+	}
+	
 	if !form.Valid() {
 		data, err := h.NewTemplateData(w, r)
 		if err != nil {
@@ -208,7 +265,7 @@ func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
 		h.ServerError(w, err)
 	}
 
-	if user.Role != "Admin" || user.Id == author {
+	if user.Role != "Admin" || user.Id != author {
 		h.ClientError(w, http.StatusForbidden)
 		return
 	}

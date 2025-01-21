@@ -144,7 +144,7 @@ func (h *Handler) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cookies.SetSessionCookie("session_id", w, session.Token, session.ExpTime)
-	http.Redirect(w, r, "/post/create", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (h *Handler) userLogoutPost(w http.ResponseWriter, r *http.Request) {

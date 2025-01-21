@@ -12,6 +12,7 @@ type Post struct {
 	Title      string
 	Content    string
 	Categories []Category
+	ImagePath  string
 	Comments   []Comment
 	Likes      int
 	Dislikes   int
@@ -21,6 +22,7 @@ type Post struct {
 type PostCreateForm struct {
 	Title              string
 	Content            string
+	ImagePath          string
 	CategoryIds        []int
 	CategoryName       []string
 	validate.Validator `form:"-"`
@@ -32,7 +34,7 @@ type Category struct {
 }
 
 type CategoryCreateForm struct {
-	Name              string
+	Name               string
 	validate.Validator `form:"-"`
 }
 
@@ -53,6 +55,6 @@ type CommentCreateForm struct {
 }
 
 type CommentWithPost struct {
-    Post Post
+	Post    Post
 	Comment Comment
 }

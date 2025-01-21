@@ -13,7 +13,7 @@ type Repo interface {
 }
 
 type PostModel interface {
-	InsertPost(user_id int, title string, content string) (int, error)
+	InsertPost(user_id int, title, content, image_path string) (int, error)
 	GetPost(id int) (*models.Post, error)
 	GetAllPosts() ([]*models.Post, error)
 	GetPostByCategory(id int) ([]*models.Post, error)
@@ -24,7 +24,7 @@ type PostModel interface {
 	FindReportsForPost(post_id int) ([]*models.Report, error)
 	ChangeReportStatus(report_id int) error
 	GetPostAuthor(post_id int) (*models.User, error)
-	UpdatePost(post_id int, title, content string) error
+	UpdatePost(post_id int, title, content, image_path string) error
 }
 
 type UserModel interface {

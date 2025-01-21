@@ -82,3 +82,18 @@ func MinChars(value string, n int) bool {
 func Matches(value string, rx *regexp.Regexp) bool {
 	return rx.MatchString(value)
 }
+
+// MaxFileSize() returns true if the file size is less than or equal to the given limit in bytes.
+func MaxFileSize(size int64, limit int64) bool {
+	return size <= limit
+}
+
+// PermittedFileType() returns true if the file type is in a list of permitted types.
+func PermittedFileType(fileType string, permittedTypes ...string) bool {
+	for _, permitted := range permittedTypes {
+		if fileType == permitted {
+			return true
+		}
+	}
+	return false
+}

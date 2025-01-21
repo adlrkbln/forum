@@ -5,7 +5,7 @@ import (
 )
 
 func (s *service) InsertPost(form models.PostCreateForm, data *models.TemplateData) (int, error) {
-	id, err := s.repo.InsertPost(data.User.Id, form.Title, form.Content)
+	id, err := s.repo.InsertPost(data.User.Id, form.Title, form.Content, form.ImagePath)
 	if err != nil {
 		return 0, err
 	}
@@ -63,7 +63,7 @@ func (s *service) InsertComment(post_id int, user_id int, content string) error 
 		return nil
 	}
 
-	err = s.NotifyUser(author.Id, post_id, "comment", user.Name + " commented on your post.")
+	err = s.NotifyUser(author.Id, post_id, "comment", user.Name+" commented on your post.")
 	if err != nil {
 		return err
 	}
@@ -128,11 +128,11 @@ func (s *service) DeleteComment(commentID int) error {
 }
 
 func (s *service) GetCommentedPosts(userId int) ([]*models.CommentWithPost, error) {
-    return s.repo.GetCommentedPostsByUser(userId)
+	return s.repo.GetCommentedPostsByUser(userId)
 }
 
 func (s *service) UpdatePost(id int, form models.PostCreateForm, data *models.TemplateData) error {
-	err := s.repo.UpdatePost(id, form.Title, form.Content)
+	err := s.repo.UpdatePost(id, form.Title, form.Content, form.ImagePath)
 	if err != nil {
 		return err
 	}

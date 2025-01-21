@@ -6,11 +6,11 @@ import (
 	"forum/internal/models"
 )
 
-func (sq *Sqlite) InsertPost(user_id int, title string, content string) (int, error) {
-	stmt := `INSERT INTO posts (user_id, title, content, created)
-	VALUES (?, ?, ?, CURRENT_TIMESTAMP);`
+func (sq *Sqlite) InsertPost(user_id int, title string, content string, image_path string) (int, error) {
+	stmt := `INSERT INTO posts (user_id, title, content, image_path, created)
+	VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP);`
 
-	result, err := sq.DB.Exec(stmt, user_id, title, content)
+	result, err := sq.DB.Exec(stmt, user_id, title, content, image_path)
 	if err != nil {
 		return 0, err
 	}
@@ -24,14 +24,14 @@ func (sq *Sqlite) InsertPost(user_id int, title string, content string) (int, er
 }
 
 func (sq *Sqlite) GetPost(id int) (*models.Post, error) {
-	stmt := `SELECT p.id, p.user_id, p.title, p.content, p.likes, p.dislikes, p.created, u.name FROM posts p
+	stmt := `SELECT p.id, p.user_id, p.title, p.content, p.image_path, p.likes, p.dislikes, p.created, u.name FROM posts p
 	JOIN users u ON p.user_id = u.id
 	WHERE p.id = ?`
 
 	row := sq.DB.QueryRow(stmt, id)
 
 	s := &models.Post{}
-	err := row.Scan(&s.Id, &s.UserId, &s.Title, &s.Content, &s.Likes, &s.Dislikes, &s.Created, &s.Username)
+	err := row.Scan(&s.Id, &s.UserId, &s.Title, &s.Content, &s.ImagePath, &s.Likes, &s.Dislikes, &s.Created, &s.Username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, models.ErrNoRecord
@@ -230,8 +230,8 @@ func (sq *Sqlite) GetPostAuthor(post_id int) (*models.User, error) {
 	return s, err
 }
 
-func (sq *Sqlite) UpdatePost(post_id int, title, content string) error {
-	query := `UPDATE posts SET title = ?, content = ?, updated = CURRENT_TIMESTAMP WHERE id = ?`
-	_, err := sq.DB.Exec(query, title, content, post_id)
+func (sq *Sqlite) UpdatePost(post_id int, title, content, image_path string) error {
+	query := `UPDATE posts SET title = ?, content = ?, image_path = ?, updated = CURRENT_TIMESTAMP WHERE id = ?`
+	_, err := sq.DB.Exec(query, title, content, image_path, post_id)
 	return err
 }
