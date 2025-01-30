@@ -42,6 +42,7 @@ type UserModel interface {
 	GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error)
 	GetModeratorReports(user_id int) ([]*models.Report, error)
 	DemoteModerator(userID int) error
+	GetUserByEmail(email string) (*models.User, error)
 }
 
 type CommentModel interface {

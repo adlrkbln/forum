@@ -26,6 +26,10 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("/user/login", h.CheckGuest(h.userLogin))
 	mux.HandleFunc("/user/logout", h.RequireAuthentication(h.userLogoutPost))
 	mux.HandleFunc("/user/profile", h.RequireAuthentication(h.accountPageGet))
+	mux.HandleFunc("/auth/google/login", h.CheckGuest(h.GoogleLogin))
+	mux.HandleFunc("/auth/google/callback", h.CheckGuest(h.GoogleCallback))
+	mux.HandleFunc("/auth/github/login", h.CheckGuest(h.GithubLogin))
+	mux.HandleFunc("/auth/github/callback", h.CheckGuest(h.GithubCallback))
 	mux.HandleFunc("/notifications/read", h.RequireAuthentication(h.markNotificationRead))
 
 	mux.HandleFunc("/moderator/request", h.RequireAuthentication(h.userRequestModerator))

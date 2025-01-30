@@ -142,3 +142,11 @@ func (s *service) GetCommentAuthor(comment_id int) (int, error) {
 	}
 	return author.Id, nil
 }
+
+func (s *service) GetUserByEmail(email string) (*models.User, error) {
+	user, err := s.repo.GetUserByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}

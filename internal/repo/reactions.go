@@ -2,7 +2,6 @@ package repo
 
 import (
 	"database/sql"
-	"log"
 )
 
 func (sq *Sqlite) AddLikePost(post_id int, user_id int) error {
@@ -85,7 +84,6 @@ func (sq *Sqlite) AddLikeComment(comment_id int, user_id int) error {
 	if err != nil {
 		return err
 	}
-	log.Println("like")
 
 	return nil
 }

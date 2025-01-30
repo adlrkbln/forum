@@ -68,4 +68,5 @@ type User interface {
 	GetNotifications() ([]*models.Notification, error)
 	GetPostAuthor(post_id int) (int, error)
 	GetCommentAuthor(comment_id int) (int, error)
+	GetUserByEmail(email string) (*models.User, error)
 }

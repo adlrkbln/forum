@@ -82,8 +82,7 @@ func (h *Handler) deleteComment(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.ServerError(w, err)
 	}
-
-	if user.Role != "Admin" || user.Id != author {
+	if user.Role != "Admin" && user.Id != author {
 		h.ClientError(w, http.StatusForbidden)
 		return
 	}
@@ -97,7 +96,7 @@ func (h *Handler) deleteComment(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) commentEdit(w http.ResponseWriter, r *http.Request) {
-    switch r.Method {
+	switch r.Method {
 	case http.MethodGet:
 		id, err := strconv.Atoi(r.URL.Query().Get("id"))
 		if err != nil || id < 1 {
@@ -138,7 +137,6 @@ func (h *Handler) commentEditPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("Form Data:", r.PostForm)
 	id, err := strconv.Atoi(r.PostForm.Get("comment_id"))
 	if err != nil || id < 1 {
 		h.ClientError(w, http.StatusBadRequest)
@@ -146,7 +144,7 @@ func (h *Handler) commentEditPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := models.CommentCreateForm{
-		Content:     r.PostForm.Get("content"),
+		Content: r.PostForm.Get("content"),
 	}
 
 	form.CheckField(validate.NotBlank(form.Content), "content", "This field cannot be blank")
@@ -166,7 +164,7 @@ func (h *Handler) commentEditPost(w http.ResponseWriter, r *http.Request) {
 		h.ServerError(w, err)
 		return
 	}
-	
+
 	err = h.service.UpdateComment(id, form, data)
 	if err != nil {
 		h.ServerError(w, err)

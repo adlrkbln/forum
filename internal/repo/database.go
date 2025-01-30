@@ -31,7 +31,7 @@ func OpenDB(dsn string) (*Sqlite, error) {
 			dislikes INTEGER DEFAULT 0,
 			created TIMESTAMP,
 			updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	);`,
+		);`,
 		`CREATE TABLE IF NOT EXISTS sessions (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER,
@@ -98,8 +98,8 @@ func OpenDB(dsn string) (*Sqlite, error) {
 			category_id INTEGER,
 			post_id INTEGER, 
 			PRIMARY KEY (category_id, post_id),
-			FOREIGN KEY (post_id) REFERENCES posts(id),
-			FOREIGN KEY (category_id) REFERENCES category(id)
+			FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+			FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE
 		);`,
 		`CREATE TABLE IF NOT EXISTS notifications (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,

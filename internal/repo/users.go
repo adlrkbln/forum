@@ -260,3 +260,16 @@ func (sq *Sqlite) DemoteModerator(userID int) error {
 	_, err := sq.DB.Exec(query, userID)
 	return err
 }
+
+func (sq *Sqlite) GetUserByEmail(email string) (*models.User, error) {
+	var u models.User
+	stmt := `SELECT id, name, email, created, role FROM users WHERE email=?`
+	err := sq.DB.QueryRow(stmt, email).Scan(&u.Id, &u.Name, &u.Email, &u.Created, &u.Role)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &u, nil
+}

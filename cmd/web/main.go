@@ -6,6 +6,7 @@ import (
 	"forum/internal/handlers"
 	"forum/internal/repo"
 	"forum/internal/service"
+	"forum/conf"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +17,7 @@ import (
 
 func main() {
 	dsn := "./forum.db"
+	configPath := "./config.json"
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
@@ -24,13 +26,17 @@ func main() {
 	if err != nil {
 		errorLog.Fatal(err)
 	}
-
+	
+	config, err := conf.Load(configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 	templateCache, err := app.NewTemplateCache()
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 
-	app := app.New(infoLog, errorLog, templateCache)
+	app := app.New(infoLog, errorLog, templateCache, config.GoogleConfig, config.GithubConfig)
 	service := service.NewService(db)
 	handlers := handlers.New(app, service)
 
