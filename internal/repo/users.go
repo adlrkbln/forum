@@ -143,7 +143,10 @@ func (sq *Sqlite) GetAllReports() ([]*models.Report, error) {
 func (sq *Sqlite) RequestModeratorRole(user_id int) error {
 	stmt := "INSERT INTO moderator_requests (user_id, status) VALUES (?, 'Pending')"
 	_, err := sq.DB.Exec(stmt, user_id)
-	return fmt.Errorf("repo.RequestModeratorRole: %w", err)
+	if err != nil {
+		return fmt.Errorf("repo.RequestModeratorRole: %w", err)
+	}
+	return nil
 }
 
 func (sq *Sqlite) GetAllRequests() ([]*models.ModeratorRequest, error) {
@@ -201,7 +204,10 @@ func (sq *Sqlite) PromoteUserToModerator(request_id int) error {
 func (sq *Sqlite) DenyModeratorRequest(request_id int) error {
 	query := "UPDATE moderator_requests SET status = 'Denied' WHERE id = ?"
 	_, err := sq.DB.Exec(query, request_id)
-	return fmt.Errorf("repo.DenyModeratorRequest: %w", err)
+	if err != nil {
+		return fmt.Errorf("repo.DenyModeratorRequest: %w", err)
+	}
+	return nil
 }
 
 func (sq *Sqlite) GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error) {

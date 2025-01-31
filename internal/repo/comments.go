@@ -125,7 +125,10 @@ func (sq *Sqlite) GetCommentsForPost(post_id int) ([]models.Comment, error) {
 func (sq *Sqlite) UpdateComment(comment_id int, content string) error {
 	query := `UPDATE comments SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
 	_, err := sq.DB.Exec(query, content, comment_id)
-	return fmt.Errorf("repo.UpdateComment: %w", err)
+	if err != nil {
+		return fmt.Errorf("repo.UpdateComment: %w", err)
+	}
+	return nil
 }
 
 func (sq *Sqlite) GetComment(id int) (*models.Comment, error) {
