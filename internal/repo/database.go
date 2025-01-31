@@ -116,11 +116,11 @@ func OpenDB(dsn string) (*Sqlite, error) {
 	for _, query := range queries {
 		stmt, err := db.Prepare(query)
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", "sqlite.OpenDB", err)
+			return nil, fmt.Errorf("%s: %w", "repo.OpenDB", err)
 		}
 		_, err = stmt.Exec()
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", "sqlite.OpenDB", err)
+			return nil, fmt.Errorf("%s: %w", "repo.OpenDB", err)
 		}
 		stmt.Close()
 	}

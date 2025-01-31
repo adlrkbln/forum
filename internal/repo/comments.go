@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"forum/internal/models"
 )
 
@@ -10,7 +11,7 @@ func (sq *Sqlite) DeleteComment(commentID int) error {
 	stmt := `DELETE FROM comments WHERE id = ?`
 	_, err := sq.DB.Exec(stmt, commentID)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.DeleteComment: %w", err)
 	}
 	return nil
 }
@@ -27,7 +28,7 @@ func (sq *Sqlite) GetCommentedPostsByUser(userId int) ([]*models.CommentWithPost
     `
 	rows, err := sq.DB.Query(stmt, userId)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetCommentedPostsByUser: %w", err)
 	}
 	defer rows.Close()
 
@@ -43,7 +44,7 @@ func (sq *Sqlite) GetCommentedPostsByUser(userId int) ([]*models.CommentWithPost
 			&commentWithPost.Post.Created,
 		)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetCommentedPostsByUser: %w", err)
 		}
 		commentsWithPosts = append(commentsWithPosts, commentWithPost)
 	}
@@ -56,7 +57,7 @@ func (sq *Sqlite) InsertComment(post_id int, user_id int, content string) error 
 
 	_, err := sq.DB.Exec(stmt, post_id, user_id, content)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.InsertComment: %w", err)
 	}
 	return nil
 }
@@ -67,7 +68,7 @@ func (sq *Sqlite) GetAllComments() ([]*models.Comment, error) {
 
 	rows, err := sq.DB.Query(stmt)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetAllComments: %w", err)
 	}
 
 	defer rows.Close()
@@ -78,13 +79,13 @@ func (sq *Sqlite) GetAllComments() ([]*models.Comment, error) {
 		s := &models.Comment{}
 		err = rows.Scan(&s.Id)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetAllComments: %w", err)
 		}
 		comments = append(comments, s)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetAllComments: %w", err)
 	}
 
 	return comments, nil
@@ -98,7 +99,7 @@ func (sq *Sqlite) GetCommentsForPost(post_id int) ([]models.Comment, error) {
 
 	rows, err := sq.DB.Query(stmt, post_id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetCommentsForPost: %w", err)
 	}
 
 	defer rows.Close()
@@ -109,13 +110,13 @@ func (sq *Sqlite) GetCommentsForPost(post_id int) ([]models.Comment, error) {
 		s := models.Comment{}
 		err = rows.Scan(&s.Id, &s.PostId, &s.UserId, &s.Username, &s.Content, &s.Created, &s.Likes, &s.Dislikes)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetCommentsForPost: %w", err)
 		}
 		comments = append(comments, s)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetCommentsForPost: %w", err)
 	}
 
 	return comments, nil
@@ -124,7 +125,7 @@ func (sq *Sqlite) GetCommentsForPost(post_id int) ([]models.Comment, error) {
 func (sq *Sqlite) UpdateComment(comment_id int, content string) error {
 	query := `UPDATE comments SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`
 	_, err := sq.DB.Exec(query, content, comment_id)
-	return err
+	return fmt.Errorf("repo.UpdateComment: %w", err)
 }
 
 func (sq *Sqlite) GetComment(id int) (*models.Comment, error) {
@@ -139,7 +140,7 @@ func (sq *Sqlite) GetComment(id int) (*models.Comment, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, models.ErrNoRecord
 		} else {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetComment: %w", err)
 		}
 	}
 
@@ -158,8 +159,8 @@ func (sq *Sqlite) GetCommentAuthor(comment_id int) (*models.User, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, models.ErrNoRecord
 		} else {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetCommentAuthor: %w", err)
 		}
 	}
-	return s, err
+	return s, nil
 }

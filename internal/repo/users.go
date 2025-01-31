@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"forum/internal/models"
 	"strings"
 
@@ -13,7 +14,7 @@ import (
 func (sq *Sqlite) InsertUser(name, email, password string) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.InsertUser: %w", err)
 	}
 
 	stmt := `INSERT INTO users (name, email, hashed_password, created)
@@ -26,7 +27,7 @@ func (sq *Sqlite) InsertUser(name, email, password string) error {
 				return models.ErrDuplicateEmail
 			}
 		}
-		return err
+		return fmt.Errorf("repo.InsertUser: %w", err)
 	}
 
 	return nil
@@ -43,7 +44,7 @@ func (sq *Sqlite) AuthenticateUser(email, password string) (int, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return 0, models.ErrInvalidCredentials
 		} else {
-			return 0, err
+			return 0, fmt.Errorf("repo.AuthenticateUser: %w", err)
 		}
 	}
 
@@ -52,7 +53,7 @@ func (sq *Sqlite) AuthenticateUser(email, password string) (int, error) {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			return 0, models.ErrInvalidCredentials
 		} else {
-			return 0, err
+			return 0, fmt.Errorf("repo.AuthenticateUser: %w", err)
 		}
 	}
 
@@ -65,7 +66,7 @@ func (sq *Sqlite) Exists(id int) (bool, error) {
 
 	err := sq.DB.QueryRow(stmt, id).Scan(&exists)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("repo.Exists: %w", err)
 	}
 	return exists, err
 }
@@ -75,7 +76,7 @@ func (sq *Sqlite) GetUserByID(id int) (*models.User, error) {
 	stmt := `SELECT id, name, email, created, role FROM users WHERE id=?`
 	err := sq.DB.QueryRow(stmt, id).Scan(&u.Id, &u.Name, &u.Email, &u.Created, &u.Role)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetUserByID: %w", err)
 	}
 	return &u, nil
 }
@@ -86,7 +87,7 @@ func (sq *Sqlite) GetAllUsers() ([]*models.User, error) {
 	ORDER BY role, name `
 	rows, err := sq.DB.Query(stmt)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetAllUsers: %w", err)
 	}
 	defer rows.Close()
 
@@ -94,7 +95,7 @@ func (sq *Sqlite) GetAllUsers() ([]*models.User, error) {
 	for rows.Next() {
 		u := &models.User{}
 		if err := rows.Scan(&u.Id, &u.Name, &u.Email, &u.Role); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetAllUsers: %w", err)
 		}
 		users = append(users, u)
 	}
@@ -103,7 +104,7 @@ func (sq *Sqlite) GetAllUsers() ([]*models.User, error) {
 
 func (sq *Sqlite) InsertReportPost(moderator_id int, post_id int, reason string) error {
 	_, err := sq.DB.Exec("INSERT INTO reports (post_id, moderator_id, reason) VALUES (?, ?, ?)", post_id, moderator_id, reason)
-	return err
+	return fmt.Errorf("repo.InsertReportPost: %w", err)
 }
 
 func (sq *Sqlite) GetAllReports() ([]*models.Report, error) {
@@ -113,7 +114,7 @@ func (sq *Sqlite) GetAllReports() ([]*models.Report, error) {
 
 	rows, err := sq.DB.Query(stmt)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetAllReports: %w", err)
 	}
 
 	defer rows.Close()
@@ -124,13 +125,13 @@ func (sq *Sqlite) GetAllReports() ([]*models.Report, error) {
 		s := &models.Report{}
 		err = rows.Scan(&s.Id, &s.PostId, &s.ModeratorId, &s.ModeratorName, &s.Reason, &s.Status, &s.Created)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetAllReports: %w", err)
 		}
 		reports = append(reports, s)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetAllReports: %w", err)
 	}
 
 	return reports, nil
@@ -139,66 +140,65 @@ func (sq *Sqlite) GetAllReports() ([]*models.Report, error) {
 func (sq *Sqlite) RequestModeratorRole(user_id int) error {
 	stmt := "INSERT INTO moderator_requests (user_id, status) VALUES (?, 'Pending')"
 	_, err := sq.DB.Exec(stmt, user_id)
-	return err
+	return fmt.Errorf("repo.RequestModeratorRole: %w", err)
 }
 
-
 func (sq *Sqlite) GetAllRequests() ([]*models.ModeratorRequest, error) {
-    stmt := `
+	stmt := `
         SELECT r.id, r.user_id, u.name AS username, r.status, r.requested_at
         FROM moderator_requests r
         JOIN users u ON r.user_id = u.id
 		ORDER BY r.id DESC
     `
-    rows, err := sq.DB.Query(stmt)
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()
+	rows, err := sq.DB.Query(stmt)
+	if err != nil {
+		return nil, fmt.Errorf("repo.GetAllRequests: %w", err)
+	}
+	defer rows.Close()
 
-    var requests []*models.ModeratorRequest
-    for rows.Next() {
-        s := &models.ModeratorRequest{}
-        if err := rows.Scan(&s.Id, &s.UserId, &s.Username, &s.Status, &s.RequestedAt); err != nil {
-            return nil, err
-        }
-        requests = append(requests, s)
-    }
-    return requests, nil
+	var requests []*models.ModeratorRequest
+	for rows.Next() {
+		s := &models.ModeratorRequest{}
+		if err := rows.Scan(&s.Id, &s.UserId, &s.Username, &s.Status, &s.RequestedAt); err != nil {
+			return nil, fmt.Errorf("repo.GetAllRequests: %w", err)
+		}
+		requests = append(requests, s)
+	}
+	return requests, nil
 }
 
 func (sq *Sqlite) PromoteUserToModerator(request_id int) error {
-    tx, err := sq.DB.Begin()
-    if err != nil {
-        return err
-    }
+	tx, err := sq.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("repo.PromoteUserToModerator: %w", err)
+	}
 
-    var user_id int
-    err = tx.QueryRow("SELECT user_id FROM moderator_requests WHERE id = ?", request_id).Scan(&user_id)
-    if err != nil {
-        tx.Rollback()
-        return err
-    }
+	var user_id int
+	err = tx.QueryRow("SELECT user_id FROM moderator_requests WHERE id = ?", request_id).Scan(&user_id)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("repo.PromoteUserToModerator: %w", err)
+	}
 
-    _, err = tx.Exec("UPDATE users SET role = 'Moderator' WHERE id = ?", user_id)
-    if err != nil {
-        tx.Rollback()
-        return err
-    }
+	_, err = tx.Exec("UPDATE users SET role = 'Moderator' WHERE id = ?", user_id)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("repo.PromoteUserToModerator: %w", err)
+	}
 
-    _, err = tx.Exec("UPDATE moderator_requests SET status = 'Approved' WHERE user_id = ?", user_id)
-    if err != nil {
-        tx.Rollback()
-        return err
-    }
+	_, err = tx.Exec("UPDATE moderator_requests SET status = 'Approved' WHERE user_id = ?", user_id)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("repo.PromoteUserToModerator: %w", err)
+	}
 
-    return tx.Commit()
+	return tx.Commit()
 }
 
 func (sq *Sqlite) DenyModeratorRequest(request_id int) error {
-    query := "UPDATE moderator_requests SET status = 'Denied' WHERE id = ?"
-    _, err := sq.DB.Exec(query, request_id)
-    return err
+	query := "UPDATE moderator_requests SET status = 'Denied' WHERE id = ?"
+	_, err := sq.DB.Exec(query, request_id)
+	return fmt.Errorf("repo.DenyModeratorRequest: %w", err)
 }
 
 func (sq *Sqlite) GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error) {
@@ -206,22 +206,22 @@ func (sq *Sqlite) GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequ
         FROM moderator_requests r
         JOIN users u ON r.user_id = u.id
         WHERE r.user_id = ?`
-	
-    rows, err := sq.DB.Query(stmt, user_id)
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()
 
-    var requests []*models.ModeratorRequest
-    for rows.Next() {
-        s := &models.ModeratorRequest{}
-        if err := rows.Scan(&s.Id, &s.UserId, &s.Username, &s.Status, &s.RequestedAt); err != nil {
-            return nil, err
-        }
-        requests = append(requests, s)
-    }
-    return requests, nil
+	rows, err := sq.DB.Query(stmt, user_id)
+	if err != nil {
+		return nil, fmt.Errorf("repo.GetUserModeratorRequests: %w", err)
+	}
+	defer rows.Close()
+
+	var requests []*models.ModeratorRequest
+	for rows.Next() {
+		s := &models.ModeratorRequest{}
+		if err := rows.Scan(&s.Id, &s.UserId, &s.Username, &s.Status, &s.RequestedAt); err != nil {
+			return nil, fmt.Errorf("repo.GetUserModeratorRequests: %w", err)
+		}
+		requests = append(requests, s)
+	}
+	return requests, nil
 }
 
 func (sq *Sqlite) GetModeratorReports(user_id int) ([]*models.Report, error) {
@@ -232,7 +232,7 @@ func (sq *Sqlite) GetModeratorReports(user_id int) ([]*models.Report, error) {
 
 	rows, err := sq.DB.Query(stmt, user_id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetModeratorReports: %w", err)
 	}
 
 	defer rows.Close()
@@ -243,13 +243,13 @@ func (sq *Sqlite) GetModeratorReports(user_id int) ([]*models.Report, error) {
 		s := &models.Report{}
 		err = rows.Scan(&s.Id, &s.PostId, &s.ModeratorId, &s.ModeratorName, &s.Reason, &s.Status, &s.Created)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetModeratorReports: %w", err)
 		}
 		reports = append(reports, s)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetModeratorReports: %w", err)
 	}
 
 	return reports, nil
@@ -258,7 +258,7 @@ func (sq *Sqlite) GetModeratorReports(user_id int) ([]*models.Report, error) {
 func (sq *Sqlite) DemoteModerator(userID int) error {
 	query := "UPDATE users SET role = 'User' WHERE id = ? AND role = 'Moderator'"
 	_, err := sq.DB.Exec(query, userID)
-	return err
+	return fmt.Errorf("repo.DemoteModerator: %w", err)
 }
 
 func (sq *Sqlite) GetUserByEmail(email string) (*models.User, error) {
@@ -269,7 +269,7 @@ func (sq *Sqlite) GetUserByEmail(email string) (*models.User, error) {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
-		return nil, err
+		return nil, fmt.Errorf("repo.GetUserByEmail: %w", err)
 	}
 	return &u, nil
 }

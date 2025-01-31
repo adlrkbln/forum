@@ -22,8 +22,14 @@ func (s *service) GetPost(id int) (*models.Post, error) {
 	if err != nil {
 		return nil, err
 	}
+	
+	categories, err := s.repo.GetCategoriesForPost(post.Id)
+	if err != nil {
+		return nil, err
+	}
 
 	post.Comments = comments
+	post.Categories = categories
 	return post, nil
 }
 
@@ -32,7 +38,13 @@ func (s *service) GetAllPosts() ([]*models.Post, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	for i, post := range posts {
+		categories, err := s.repo.GetCategoriesForPost(post.Id)
+		if err != nil {
+			return nil, err
+		}
+		posts[i].Categories = categories
+	}
 	return posts, nil
 }
 

@@ -24,13 +24,13 @@ type GithubConfig struct {
 func Load(path string) (*Config, error) {
 	confJSON, err := os.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("read config file: %w", err)
+		return nil, fmt.Errorf("Read config file: %w", err)
 	}
 
 	conf := &Config{}
 	err = json.Unmarshal(confJSON, conf)
 	if err != nil {
-		return nil, fmt.Errorf("unmarshal config file: %w", err)
+		return nil, fmt.Errorf("Unmarshal config file: %w", err)
 	}
 
 	return conf, nil

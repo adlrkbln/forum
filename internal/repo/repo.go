@@ -69,6 +69,7 @@ type Category interface {
 	PostCategoryPost(post_id int, category_id int) error
 	CreateCategory(name string) error
 	DeleteCategory(id int) error
+	GetCategoriesForPost(post_id int) ([]models.Category, error)
 }
 
 type Reaction interface {

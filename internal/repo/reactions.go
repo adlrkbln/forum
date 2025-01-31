@@ -2,6 +2,7 @@ package repo
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 func (sq *Sqlite) AddLikePost(post_id int, user_id int) error {
@@ -9,7 +10,7 @@ func (sq *Sqlite) AddLikePost(post_id int, user_id int) error {
 
 	_, err := sq.DB.Exec(stmt, post_id)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.AddLikePost: %w", err)
 	}
 
 	return nil
@@ -20,7 +21,7 @@ func (sq *Sqlite) AddDislikePost(post_id int, user_id int) error {
 
 	_, err := sq.DB.Exec(stmt, post_id)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.AddDislikePost: %w", err)
 	}
 	return nil
 }
@@ -35,7 +36,7 @@ func (sq *Sqlite) CheckUserReactionsPost(post_id int, user_id int) (int, error) 
 		if err == sql.ErrNoRows {
 			return 0, nil
 		}
-		return 0, err
+		return 0, fmt.Errorf("repo.CheckUserReactionsPost: %w", err)
 	}
 
 	return reaction, nil
@@ -47,7 +48,7 @@ func (sq *Sqlite) InsertUserReactionPost(post_id int, user_id int, reaction int)
 
 	_, err := sq.DB.Exec(stmt, post_id, user_id, reaction)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.InsertUserReactionPost: %w", err)
 	}
 
 	return nil
@@ -59,7 +60,7 @@ func (sq *Sqlite) RemoveUserReactionPost(post_id int, user_id int, reaction int)
 
 	_, err := sq.DB.Exec(stmt, post_id, user_id)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.RemoveUserReactionPost: %w", err)
 	}
 
 	if reaction == 1 {
@@ -72,7 +73,7 @@ func (sq *Sqlite) RemoveUserReactionPost(post_id int, user_id int, reaction int)
 
 	_, err = sq.DB.Exec(stmt, post_id)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.RemoveUserReactionPost: %w", err)
 	}
 	return nil
 }
@@ -82,7 +83,7 @@ func (sq *Sqlite) AddLikeComment(comment_id int, user_id int) error {
 
 	_, err := sq.DB.Exec(stmt, comment_id)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.AddLikeComment: %w", err)
 	}
 
 	return nil
@@ -93,7 +94,7 @@ func (sq *Sqlite) AddDislikeComment(comment_id int, user_id int) error {
 
 	_, err := sq.DB.Exec(stmt, comment_id)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.AddDislikeComment: %w", err)
 	}
 	return nil
 }
@@ -108,7 +109,7 @@ func (sq *Sqlite) CheckUserReactionComment(comment_id int, user_id int) (int, er
 		if err == sql.ErrNoRows {
 			return 0, nil
 		}
-		return 0, err
+		return 0, fmt.Errorf("repo.CheckUserReactionComment: %w", err)
 	}
 
 	return reaction, nil
@@ -120,7 +121,7 @@ func (sq *Sqlite) InsertUserReactionComment(comment_id int, user_id int, reactio
 
 	_, err := sq.DB.Exec(stmt, comment_id, user_id, reaction)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.InsertUserReactionComment: %w", err)
 	}
 
 	return nil
@@ -132,7 +133,7 @@ func (sq *Sqlite) RemoveUserReactionComment(comment_id int, user_id int, reactio
 
 	_, err := sq.DB.Exec(stmt, comment_id, user_id)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.RemoveUserReactionComment: %w", err)
 	}
 
 	if reaction == 1 {
@@ -145,7 +146,7 @@ func (sq *Sqlite) RemoveUserReactionComment(comment_id int, user_id int, reactio
 
 	_, err = sq.DB.Exec(stmt, comment_id)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.RemoveUserReactionComment: %w", err)
 	}
 	return nil
 }

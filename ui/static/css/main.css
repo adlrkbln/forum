@@ -288,6 +288,12 @@ footer{
     gap:5px;
     z-index: 1000;
 }
+
+.category {
+    display: inline;
+    margin-right: 10px;
+}
+
 .post-list-container{
     flex:1;
 }

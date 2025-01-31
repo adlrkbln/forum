@@ -89,3 +89,33 @@ func (sq *Sqlite) DeleteCategory(id int) error {
 	}
 	return nil
 }
+
+func (sq *Sqlite) GetCategoriesForPost(post_id int) ([]models.Category, error) {
+	stmt := `SELECT c.id, c.name FROM category c 
+	JOIN post_category pc ON c.id = pc.category_id
+	WHERE pc.post_id = ? `
+
+	rows, err := sq.DB.Query(stmt, post_id)
+	if err != nil {
+		return nil, fmt.Errorf("repo.GetCategoriesForPost: %w", err)
+	}
+
+	defer rows.Close()
+
+	categories := []models.Category{}
+
+	for rows.Next() {
+		s := &models.Category{}
+		err = rows.Scan(&s.Id, &s.Name)
+		if err != nil {
+			return nil, fmt.Errorf("repo.GetCategoriesForPost: %w", err)
+		}
+		categories = append(categories, *s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("repo.GetCategoriesForPost: %w", err)
+	}
+
+	return categories, nil
+}

@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"forum/internal/models"
 )
 
@@ -12,12 +13,12 @@ func (sq *Sqlite) InsertPost(user_id int, title string, content string, image_pa
 
 	result, err := sq.DB.Exec(stmt, user_id, title, content, image_path)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("repo.InsertPost: %w", err)
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("repo.InsertPost: %w", err)
 	}
 
 	return int(id), nil
@@ -36,7 +37,7 @@ func (sq *Sqlite) GetPost(id int) (*models.Post, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, models.ErrNoRecord
 		} else {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetPost: %w", err)
 		}
 	}
 
@@ -49,7 +50,7 @@ func (sq *Sqlite) GetAllPosts() ([]*models.Post, error) {
 
 	rows, err := sq.DB.Query(stmt)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetAllPosts: %w", err)
 	}
 
 	defer rows.Close()
@@ -60,13 +61,13 @@ func (sq *Sqlite) GetAllPosts() ([]*models.Post, error) {
 		s := &models.Post{}
 		err = rows.Scan(&s.Id, &s.UserId, &s.Title, &s.Content, &s.Likes, &s.Dislikes, &s.Created)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetAllPosts: %w", err)
 		}
 		posts = append(posts, s)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetAllPosts: %w", err)
 	}
 
 	return posts, nil
@@ -79,7 +80,7 @@ func (sq *Sqlite) GetCreatedPosts(user_id int) ([]*models.Post, error) {
 
 	rows, err := sq.DB.Query(stmt, user_id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetCreatedPosts: %w", err)
 	}
 
 	defer rows.Close()
@@ -90,13 +91,13 @@ func (sq *Sqlite) GetCreatedPosts(user_id int) ([]*models.Post, error) {
 		s := &models.Post{}
 		err = rows.Scan(&s.Id, &s.UserId, &s.Title, &s.Content, &s.Likes, &s.Dislikes, &s.Created)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetCreatedPosts: %w", err)
 		}
 		posts = append(posts, s)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetCreatedPosts: %w", err)
 	}
 
 	return posts, nil
@@ -110,7 +111,7 @@ func (sq *Sqlite) GetLikedPosts(user_id int) ([]*models.Post, error) {
 
 	rows, err := sq.DB.Query(stmt, user_id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetLikedPosts: %w", err)
 	}
 
 	defer rows.Close()
@@ -121,13 +122,13 @@ func (sq *Sqlite) GetLikedPosts(user_id int) ([]*models.Post, error) {
 		s := &models.Post{}
 		err = rows.Scan(&s.Id, &s.UserId, &s.Title, &s.Content, &s.Likes, &s.Dislikes, &s.Created)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetLikedPosts: %w", err)
 		}
 		posts = append(posts, s)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetLikedPosts: %w", err)
 	}
 
 	return posts, nil
@@ -141,7 +142,7 @@ func (sq *Sqlite) GetDislikedPosts(user_id int) ([]*models.Post, error) {
 
 	rows, err := sq.DB.Query(stmt, user_id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetDislikedPosts: %w", err)
 	}
 
 	defer rows.Close()
@@ -152,13 +153,13 @@ func (sq *Sqlite) GetDislikedPosts(user_id int) ([]*models.Post, error) {
 		s := &models.Post{}
 		err = rows.Scan(&s.Id, &s.UserId, &s.Title, &s.Content, &s.Likes, &s.Dislikes, &s.Created)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetDislikedPosts: %w", err)
 		}
 		posts = append(posts, s)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.GetDislikedPosts: %w", err)
 	}
 
 	return posts, nil
@@ -169,7 +170,7 @@ func (sq *Sqlite) FindReportsForPost(post_id int) ([]*models.Report, error) {
 
 	rows, err := sq.DB.Query(stmt, post_id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.FindReportsForPost: %w", err)
 	}
 
 	defer rows.Close()
@@ -180,13 +181,13 @@ func (sq *Sqlite) FindReportsForPost(post_id int) ([]*models.Report, error) {
 		s := &models.Report{}
 		err = rows.Scan(&s.Id, &s.PostId, &s.ModeratorId, &s.Reason, &s.Status, &s.Created)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("repo.FindReportsForPost: %w", err)
 		}
 		reports = append(reports, s)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo.FindReportsForPost: %w", err)
 	}
 	return reports, nil
 }
@@ -197,7 +198,7 @@ func (sq *Sqlite) ChangeReportStatus(report_id int) error {
 
 	_, err := sq.DB.Exec(stmt, report_id)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.ChangeReportStatus: %w", err)
 	}
 	return nil
 }
@@ -207,7 +208,7 @@ func (sq *Sqlite) DeletePost(post_id int) error {
 
 	_, err := sq.DB.Exec(stmt, post_id)
 	if err != nil {
-		return err
+		return fmt.Errorf("repo.DeletePost: %w", err)
 	}
 	return nil
 }
@@ -224,7 +225,7 @@ func (sq *Sqlite) GetPostAuthor(post_id int) (*models.User, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, models.ErrNoRecord
 		} else {
-			return nil, err
+			return nil, fmt.Errorf("repo.GetPostAuthor: %w", err)
 		}
 	}
 	return s, err

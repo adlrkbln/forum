@@ -6,6 +6,11 @@
         <div class='metadata'>
             <strong>{{.Title}}</strong>
         </div>
+        <div class='metadata'>
+            {{range .Categories}}
+                <span class="category">{{.Name}}</span>
+            {{end}}
+        </div>
         <pre><code>{{.Content}}</code></pre>
         {{if ne .ImagePath "/static/img/default.png"}}
             <img src="{{.ImagePath}}" alt="image">

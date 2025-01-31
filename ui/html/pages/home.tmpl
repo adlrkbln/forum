@@ -18,12 +18,15 @@
      <table>
         <tr>
             <th>Title</th>
+            <th>Categories</th>
             <th>Created</th>
         </tr>
         {{range .Posts}}
         <tr>
             <td><a href='/post/view?id={{.Id}}'>{{.Title}}</a></td>
-            <!-- Use the new template function here -->
+            <td>{{range .Categories}}
+            {{.Name}} 
+            {{end}}</td>
             <td>{{humanDate .Created}}</td>
         </tr>
         {{end}}

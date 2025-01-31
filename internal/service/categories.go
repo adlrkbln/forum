@@ -18,7 +18,13 @@ func (s *service) GetPostByCategory(id int) ([]*models.Post, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	for i, post := range posts {
+		categories, err := s.repo.GetCategoriesForPost(post.Id)
+		if err != nil {
+			return nil, err
+		}
+		posts[i].Categories = categories
+	}
 	return posts, nil
 }
 
