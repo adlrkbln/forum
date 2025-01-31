@@ -24,7 +24,7 @@ type PostModel interface {
 	FindReportsForPost(post_id int) ([]*models.Report, error)
 	ChangeReportStatus(report_id int) error
 	GetPostAuthor(post_id int) (*models.User, error)
-	UpdatePost(post_id int, title, content, image_path string) error
+	UpdatePost(post_id int, title, content string) error
 }
 
 type UserModel interface {

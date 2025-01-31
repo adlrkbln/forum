@@ -265,6 +265,7 @@ func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
 	author, err := h.service.GetPostAuthor(post_id)
 	if err != nil {
 		h.ServerError(w, err)
+		return
 	}
 
 	if user.Role != "Admin" && user.Id != author {
@@ -277,7 +278,7 @@ func (h *Handler) deletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/user/profile", http.StatusSeeOther)
+	http.Redirect(w, r, r.Referer(), http.StatusSeeOther)
 }
 
 func (h *Handler) ignoreReport(w http.ResponseWriter, r *http.Request) {
@@ -329,8 +330,9 @@ func (h *Handler) postEdit(w http.ResponseWriter, r *http.Request) {
 		}
 		data.Post = post
 		data.Form = models.PostCreateForm{
-			Title:   post.Title,
-			Content: post.Content,
+			Title:     post.Title,
+			Content:   post.Content,
+			ImagePath: post.ImagePath,
 		}
 		data.Form = models.PostCreateForm{}
 		h.Render(w, http.StatusOK, "edit_post.tmpl", data)

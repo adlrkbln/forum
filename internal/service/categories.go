@@ -49,5 +49,19 @@ func (s *service) DeleteCategory(id int) error {
 	if id <= 0 {
 		return fmt.Errorf("invalid category ID")
 	}
-	return s.repo.DeleteCategory(id)
+	posts, err := s.repo.GetPostByCategory(id)
+	if err != nil {
+		return err
+	}
+	for _, post := range posts {
+		err = s.repo.DeletePost(post.Id)
+		if err != nil {
+			return err
+		}
+	}
+	err = s.repo.DeleteCategory(id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

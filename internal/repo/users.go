@@ -104,7 +104,10 @@ func (sq *Sqlite) GetAllUsers() ([]*models.User, error) {
 
 func (sq *Sqlite) InsertReportPost(moderator_id int, post_id int, reason string) error {
 	_, err := sq.DB.Exec("INSERT INTO reports (post_id, moderator_id, reason) VALUES (?, ?, ?)", post_id, moderator_id, reason)
-	return fmt.Errorf("repo.InsertReportPost: %w", err)
+	if err != nil {
+		return fmt.Errorf("repo.InsertReportPost: %w", err)
+	}
+	return nil
 }
 
 func (sq *Sqlite) GetAllReports() ([]*models.Report, error) {

@@ -231,8 +231,8 @@ func (sq *Sqlite) GetPostAuthor(post_id int) (*models.User, error) {
 	return s, err
 }
 
-func (sq *Sqlite) UpdatePost(post_id int, title, content, image_path string) error {
-	query := `UPDATE posts SET title = ?, content = ?, image_path = ?, updated = CURRENT_TIMESTAMP WHERE id = ?`
-	_, err := sq.DB.Exec(query, title, content, image_path, post_id)
+func (sq *Sqlite) UpdatePost(post_id int, title, content string) error {
+	query := `UPDATE posts SET title = ?, content = ?, updated = CURRENT_TIMESTAMP WHERE id = ?`
+	_, err := sq.DB.Exec(query, title, content, post_id)
 	return err
 }

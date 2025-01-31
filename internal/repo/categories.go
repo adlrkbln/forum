@@ -33,7 +33,7 @@ func (sq *Sqlite) GetPostByCategory(id int) ([]*models.Post, error) {
 	JOIN post_category pc ON p.id = pc.post_id 
 	JOIN category c ON pc.category_id = c.id
 	WHERE c.id = ?
-    ORDER BY p.id`
+    ORDER BY p.id DESC`
 
 	rows, err := sq.DB.Query(stmt, id)
 	if err != nil {

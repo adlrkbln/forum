@@ -91,7 +91,7 @@ func OpenDB(dsn string) (*Sqlite, error) {
 			FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 		);`,
 		`CREATE TABLE IF NOT EXISTS category (
-			id INTEGER PRIMARY KEY,
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			name TEXT NOT NULL
 		);`,
 		`CREATE TABLE IF NOT EXISTS post_category (
