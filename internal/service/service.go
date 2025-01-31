@@ -13,6 +13,8 @@ type service struct {
 type Service interface {
 	Post
 	User
+	Comment
+	Notification
 }
 
 func NewService(repo repo.Repo) Service {
@@ -26,22 +28,25 @@ type Post interface {
 	GetCategories() ([]*models.Category, error)
 	GetPostByCategory(id int) ([]*models.Post, error)
 	PostCategoryPost(post_id int, categoryIds []int) error
-	GetAllComments() ([]*models.Comment, error)
-	InsertComment(post_id int, user_id int, content string) error
 	GetCreatedPosts(user_id int) ([]*models.Post, error)
 	GetLikedPosts(user_id int) ([]*models.Post, error)
 	GetDislikedPosts(user_id int) ([]*models.Post, error)
 	AddDislikePost(post_id int, user_id int) error
 	AddLikePost(post_id int, user_id int) error
-	AddLikeComment(comment_id, user_id int) error
-	AddDislikeComment(comment_id, user_id int) error
 	DeletePost(post_id int) error
 	IgnoreReport(report_id int) error
 	DeleteCategory(id int) error
 	CreateCategory(form models.CategoryCreateForm) error
+	UpdatePost(id int, form models.PostCreateForm, data *models.TemplateData) error
+}
+
+type Comment interface {
+	GetAllComments() ([]*models.Comment, error)
+	InsertComment(post_id int, user_id int, content string) error
+	AddLikeComment(comment_id, user_id int) error
+	AddDislikeComment(comment_id, user_id int) error
 	DeleteComment(commentID int) error
 	GetCommentedPosts(userId int) ([]*models.CommentWithPost, error)
-	UpdatePost(id int, form models.PostCreateForm, data *models.TemplateData) error
 	UpdateComment(id int, form models.CommentCreateForm, data *models.TemplateData) error
 	GetComment(id int) (*models.Comment, error)
 }
@@ -62,11 +67,14 @@ type User interface {
 	GetUserModeratorRequests(user_id int) ([]*models.ModeratorRequest, error)
 	GetModeratorReports(user_id int) ([]*models.Report, error)
 	DemoteModerator(userID int) error
+	GetPostAuthor(post_id int) (int, error)
+	GetCommentAuthor(comment_id int) (int, error)
+	GetUserByEmail(email string) (*models.User, error)
+}
+
+type Notification interface {
 	NotifyUser(userId int, postId int, notifType, message string) error
 	GetUnreadNotifications(userId int) ([]*models.Notification, error)
 	MarkNotificationAsRead(notificationId int) error
 	GetNotifications() ([]*models.Notification, error)
-	GetPostAuthor(post_id int) (int, error)
-	GetCommentAuthor(comment_id int) (int, error)
-	GetUserByEmail(email string) (*models.User, error)
 }

@@ -29,7 +29,7 @@ func main() {
 	
 	config, err := conf.Load(configPath)
 	if err != nil {
-		log.Fatal(err)
+		errorLog.Fatal(err)
 	}
 	templateCache, err := app.NewTemplateCache()
 	if err != nil {

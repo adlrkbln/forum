@@ -6,10 +6,10 @@ type Repo interface {
 	PostModel
 	UserModel
 	CommentModel
-	Session
-	Category
-	Reaction
-	Notification
+	SessionModel
+	CategoryModel
+	ReactionModel
+	NotificationModel
 }
 
 type PostModel interface {
@@ -56,7 +56,7 @@ type CommentModel interface {
 	GetCommentAuthor(comment_id int) (*models.User, error) 
 }
 
-type Session interface {
+type SessionModel interface {
 	DeleteSessionById(userId int) error
 	CreateSession(session *models.Session) error
 	DeleteSessionByToken(token string) error
@@ -64,7 +64,7 @@ type Session interface {
 	IsSessionValid(token string) bool
 }
 
-type Category interface {
+type CategoryModel interface {
 	GetCategories() ([]*models.Category, error)
 	PostCategoryPost(post_id int, category_id int) error
 	CreateCategory(name string) error
@@ -72,7 +72,7 @@ type Category interface {
 	GetCategoriesForPost(post_id int) ([]models.Category, error)
 }
 
-type Reaction interface {
+type ReactionModel interface {
 	AddLikePost(post_id int, user_id int) error
 	AddDislikePost(post_id int, user_id int) error
 	CheckUserReactionsPost(post_id int, user_id int) (int, error)
@@ -85,7 +85,7 @@ type Reaction interface {
 	RemoveUserReactionComment(comment_id int, user_id int, reaction int) error
 }
 
-type Notification interface {
+type NotificationModel interface {
 	CreateNotification(notification *models.Notification) error
 	GetUnreadNotifications(userId int) ([]*models.Notification, error)
 	MarkNotificationAsRead(notificationId int) error
